@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport"
+	content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta charset="utf-8" />
+<link rel="stylesheet"
+	href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1751455_icvi4gysrv.css" />
+<title>系统管理-权限管理</title>
+</head>
+<style type="text/css">
+body, html {
+	height: 100%;
+}
+
+.container-fluid {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	background-color: #F4F6F8;
+}
+
+a:hover, a:visited, a:link, a:active {
+	text-decoration: none;
+}
+
+.navigation .breadcrumb {
+	background-color: white;
+	border: 1px solid #e7e7e7;
+	border-radius: 0;
+}
+</style>
+
+<body>
+	<div class="container-fluid">
+		<!--面包屑导航-->
+		<div class="navigation">
+			<ol class="breadcrumb">
+				<li><span>系统管理</span></li>
+				<li class="active"><a href="authority.html">权限管理</a></li>
+			</ol>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				角色:<select style="width:120px; height:32px;">
+					<option th:each="message:${role}" th:text="${message.type_name}"
+						th:value="${message.id}"></option>
+				</select>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover" id="authority_table">
+					<thead>
+						<tr>
+							<th><input type="checkbox" id="check_all" /></th>
+							<th>序号</th>
+							<th>模块名称</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+			<div class="panel-footer" style="text-align: center;">
+				<button class="btn btn-primary" id="save_authority_btn">
+					<span class="iconfont icon-shouquan"></span> 授权
+				</button>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/vue.js"></script>
+	<script type="text/javascript"
+		src="static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		$(function() {
+			build_authority_table();
+		});
+
+		function build_authority_table() {
+			$
+					.get("getModules")
+					.then(
+							function(res) {
+								if (res.code === 200) {
+									$("#authority_table tbody").empty();
+									let authority = res.extend.modules;
+									$
+											.each(
+													authority,
+													function(index, items) {
+														let checkBoxTd = $(
+																"<td></td>")
+																.append(
+																		"<input type='checkbox' class='check_item'/>");
+														let id = $("<td></td>")
+																.append(
+																		items.id);
+														let moduleName = $(
+																"<td></td>")
+																.append(
+																		items.module_name);
+														$("<tr></tr>")
+																.append(
+																		checkBoxTd)
+																.append(id)
+																.append(
+																		moduleName)
+																.appendTo(
+																		"#authority_table tbody");
+													});
+								}
+							});
+		}
+
+		//给全选单选框添加点击事件
+		$("#check_all").click(function() {
+			$(".check_item").prop("checked", $(this).prop("checked"));
+		});
+
+		//给单选框添加事件
+		$(document)
+				.on(
+						"click",
+						".check_item",
+						function() {
+							let flag = $(".check_item:checked").length === $(".check_item").length;
+							$("#check_all").prop("checked", flag);
+						});
+
+		//授权权限
+		$("#save_authority_btn").click(
+				function() {
+					let moduleId = "";
+					$.each($(".check_item:checked"), function() {
+						moduleId += $(this).parents("tr").find("td:eq(1)")
+								.text()+ ",";
+					});
+					moduleId = moduleId.substring(0, moduleId.length - 1);
+					$.ajax({
+						url : "updateAuthority/" + $("select").val(),
+						type : "PUT",
+						data : "moduleIdStr=" + moduleId,
+						success : function(res) {
+							if (res.code === 200) {
+								alert("授权成功！");
+								$("#check_all").prop("checked", false);
+								$(".check_item").prop("checked", false);
+							}
+						}
+					});
+				});
+	</script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport"
+	content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta charset="utf-8" />
+<link rel="stylesheet"
+	href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1696271_2lv6e6ib6lr.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1698715_fxa7w8619v8.css" />
+<title>员工考勤-上下班打卡</title>
+</head>
+<style type="text/css">
+body, html {
+	height: 100%;
+}
+
+.container-fluid {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	background-color: #F4F6F8;
+}
+
+.navigation .breadcrumb {
+	background-color: white;
+	border: 1px solid #e7e7e7;
+	border-radius: 0;
+}
+
+table th {
+	text-align: center;
+}
+
+a:hover, a:visited, a:link, a:active {
+	text-decoration: none;
+}
+
+#btn-clock1 {
+	background-color: red;
+	width: 250px;
+	outline: none;
+	height: 250px;
+	border-radius: 50%;
+	border: none;
+	color: white;
+	margin-top: 65px;
+	box-shadow: 0px 10px 20px #EA4335;
+}
+
+#btn-clock2 {
+	background-color: #3297FB;
+	width: 250px;
+	outline: none;
+	height: 250px;
+	border-radius: 50%;
+	border: none;
+	color: white;
+	margin-top: 65px;
+	box-shadow: 0px 10px 20px #6DB5FB;
+	margin-left: 100px;
+}
+</style>
+
+<body>
+	<!--个人考勤记录模态框-->
+	<div class="modal fade" tabindex="-1" role="dialog"
+		id="personnel_record_modal">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">
+						<span class="iconfont icon-yuangong" style="font-size: 22px"></span>
+						<span th:text="${session.userName}"></span>考勤记录
+					</h4>
+				</div>
+				<div class="modal-body" style="background-color: #F4F6F8;">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							考勤时间:<input type="date" id="start_time" />至<input type="date"
+								id="end_time" />
+							<button class="btn btn-info" id="time_query">
+								<span class="glyphicon glyphicon-search"></span>查询
+							</button>
+						</div>
+						<div class="panel-body" style="height: 250px">
+							<table class="table table-hover text-center"
+								id="attendance_table">
+								<thead>
+									<tr>
+										<th>序号</th>
+										<th>考勤类型</th>
+										<th>考勤时间</th>
+										<th>是否迟到/早退</th>
+									</tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+							<!--分页信息-->
+							<div id="row">
+								<!-- 分页文字信息 -->
+								<div class="col-md-6" id="page_info_area"></div>
+								<!-- 分页条信息 -->
+								<div class="col-md-6">
+									<nav aria-label="Page navigation" id="page_nav_area"></nav>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<input type="hidden" id="start" />
+	<input type="hidden" id="end" />
+	<div class="container-fluid">
+		<!--面包屑导航-->
+		<div class="navigation">
+			<ol class="breadcrumb">
+				<li><span>员工考勤</span></li>
+				<li class="active"><a href="clockIn.html">上下班打卡</a></li>
+			</ol>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<button class="btn btn-info" id="work_attendance">
+					<span class="iconfont icon-gerenkaoqin"></span>个人考勤记录
+				</button>
+			</div>
+			<div class="panel-body" style="height: 416px; text-align: center;">
+				<button id="btn-clock1">
+					<span style="font-size: 2em;" id="type_name1">上班打卡</span><br /> <span
+						class="current" style="font-size: 1.4em;"></span>
+				</button>
+				<button id="btn-clock2">
+					<span style="font-size: 2em;" id="type_name2">下班打卡</span><br /> <span
+						class="current" style="font-size: 1.4em;"></span>
+				</button>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/vue.js"></script>
+	<script type="text/javascript"
+		src="static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	<script>
+		function displayTime() {
+			let timestamp = new Date();
+			let dynamicDate = (change(timestamp.getHours()) + ':'
+					+ change(timestamp.getMinutes()) + ':' + change(timestamp
+					.getSeconds()));
+
+			function change(t) {
+				if (t < 10) {
+					return "0" + t;
+				} else {
+					return t;
+				}
+			}
+			return dynamicDate;
+		}
+		setInterval(function() {
+			$(".current").text(displayTime());
+		}, 0);
+
+		$("#btn-clock1").click(function() {
+			punch_the_clock($("#type_name1").text().substring(0,2));
+		});
+
+		$("#btn-clock2").click(function() {
+			punch_the_clock($("#type_name2").text().substring(0,2));
+		});
+		
+		function punch_the_clock(clockType){
+			$.post("addAttendance","clockType="+clockType).then(function(res){
+				if(res.code === 200){
+					alert(clockType+"打卡成功！");
+				}
+			});
+		}
+	</script>
+	<script>
+		//总记录数
+		let totalRecord;
+		//当前页
+		let currentPage;
+
+		let isClick = false;
+
+		$("#work_attendance").click(function() {
+			$(function() {
+				to_page(1);
+			});
+			$("#start_time").val("");
+			$("#end_time").val("");
+			$("#personnel_record_modal").modal({
+				backdrop : "static"
+			});
+		});
+
+		function to_page(pageNum) {
+			$.get("empAttendanceRecord", "pageNumber=" + pageNum).then(
+					function(res) {
+						//1.解析显示员工数据
+						build_informations_table(res);
+						//2.解析显示分页信息
+						build_page_info(res);
+						//3.解析显示分页条信息
+						build_page_nav(res);
+					});
+		}
+
+		//通过日期查询
+		$("#time_query").click(function() {
+			isClick = true;
+			let start = $("#start_time").val();
+			let end = $("#end_time").val();
+			query_date(1, start, end);
+			$("#start").val(start);
+			$("#end").val(end);
+		});
+
+		function query_date(pageNum, startTime, endTime) {
+			$.get(
+					"empAttendanceRecord",
+					"pageNumber=" + pageNum + "&" + "startTime=" + startTime
+							+ "&" + "endTime=" + endTime).then(function(res) {
+				//1.解析显示员工数据
+				build_informations_table(res);
+				//2.解析显示分页信息
+				build_page_info(res);
+				//3.解析显示分页条信息
+				build_page_nav(res);
+
+			});
+		}
+
+		//解析员工信息
+		function build_informations_table(res) {
+			$("#attendance_table tbody").empty();
+			let empRecord = res.extend.pageInfo.list;
+			$.each(empRecord, function(index, items) {
+				let id = $("<td></td>").append(index + 1);
+				let hiddenId = $("<td style='display:none;'></td>").append(
+						items.id);
+				let clockType = $("<td></td>").append(items.clockType);
+				let clockTime = $("<td></td>").append(items.clockTime);
+				let state = $("<td></td>").append(items.state);
+				$("<tr></tr>").append(id).append(hiddenId)
+						.append(clockType).append(clockTime).append(state)
+						.appendTo("#attendance_table tbody");
+			});
+		}
+
+		//解析分页信息
+		function build_page_info(res) {
+			$("#page_info_area").empty();
+			$("#page_info_area").append(
+					"当前第" + res.extend.pageInfo.pageNum + "页,共"
+							+ res.extend.pageInfo.pages + "页,总"
+							+ res.extend.pageInfo.total + "条记录");
+			totalRecord = res.extend.pageInfo.pages;
+			currentPage = res.extend.pageInfo.pageNum;
+		}
+
+		//解析分页条信息
+		function build_page_nav(res) {
+			$("#page_nav_area").empty();
+			let ul = $("<ul></ul>").addClass("pagination navbar-right");
+			//上一页
+			let previous = $("<li></li>")
+					.append($("<a></a>").append("&laquo;"));
+			//判断是否还有上一页，没有就将链接禁用
+			if (res.extend.pageInfo.hasPreviousPage === false) {
+				previous.addClass("disabled");
+			} else {
+				previous.click(function() {
+					if(isClick === false){
+						to_page(res.extend.pageInfo.pageNum - 1);
+					}else{
+						query_date(res.extend.pageInfo.pageNum - 1,$("#start").val(),$("#end").val());
+					}
+					
+				});
+			}
+			ul.append(previous);
+
+			//页码
+			let navigatepageNums = res.extend.pageInfo.navigatepageNums;
+			$.each(navigatepageNums, function(index, items) {
+				let pageNumber = $("<li></li>").append(
+						$("<a></a>").append(items));
+				//判断当前页码是否等于分页条的页码
+				if (res.extend.pageInfo.pageNum === items) {
+					//给页码添加高亮
+					pageNumber.addClass("active");
+				}
+				//给页码添加点击事件
+				pageNumber.click(function() {
+					if(isClick === false){
+						to_page(items);
+					}else{
+						query_date(items,$("#start").val(),$("#end").val());
+					}
+					
+				});
+				ul.append(pageNumber);
+			});
+
+			//下一页
+			let next = $("<li></li>").append($("<a></a>").append("&raquo;"));
+			//判断是否还有下一页，没有就将链接禁用
+			if (res.extend.pageInfo.hasNextPage === false) {
+				next.addClass("disabled");
+			} else {
+				next.click(function() {
+					if(isClick === false){
+						to_page(res.extend.pageInfo.pageNum + 1);
+					}else{
+						query_date(res.extend.pageInfo.pageNum + 1,$("#start").val(),$("#end").val());
+					}
+					
+				});
+			}
+			ul.append(next).appendTo("#page_nav_area");
+		}
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.graduationDesign.dao.StaffPersonnelInformationMapper">
+	<update id="editEmpPhotoUrlByUserName">
+		update pm_employee_information set emp_photo_url
+		=#{empPhotoUrl} where emp_user_name = #{empUserName}
+	</update>
+
+	<select id="getStaffInfoByEmpUserName"
+		resultType="EmployeeInformation">
+		select id,
+		emp_number,emp_name,emp_sex,emp_phone,emp_email,emp_birthday,emp_age,emp_address,emp_id_card,
+		(select type_name from pm_basic_information where id =
+		pm_employee_information.emp_nation_type_id)emp_nation_type_id,
+		(select
+		type_name from pm_basic_information where id =
+		pm_employee_information.emp_position_type_id)emp_position_type_id,
+		(select type_name from pm_basic_information where id =
+		pm_employee_information.emp_dept_type_id)emp_dept_type_id,
+		emp_political_type_id,emp_culture_type_id,emp_photo_url,emp_school,emp_major,emp_join_time,emp_user_name
+		from pm_employee_information where emp_user_name = #{empUserName}
+	</select>
+
+	<select id="getEmpIdByEmpUserName" resultType="Integer">
+		select id from
+		pm_employee_information where emp_user_name = #{empUserName}
+	</select>
+
+	<update id="editEmpInfoByEmpUserName">
+		update pm_employee_information set emp_phone =
+		#{empPhone}, emp_email= #{empEmail},emp_birthday =
+		#{empBirthday},emp_age = #{empAge},emp_address = #{empAddress},
+		emp_id_card = #{empIdCard},emp_political_type_id =
+		#{empPoliticalTypeId},emp_culture_type_id
+		=
+		#{empCultureTypeId},emp_school = #{empSchool},emp_major = #{empMajor}
+		where emp_user_name =
+		#{empUserName}
+	</update>
+
+	<select id="getStaffWagesRecords" resultType="WagesManagement">
+		select
+		years,months,monthly_wages,performance_royalty,deduct,real_pay from
+		pm_wages_management where emp_id in (select id from
+		pm_employee_information
+		where id = #{id})
+	</select>
+</mapper>

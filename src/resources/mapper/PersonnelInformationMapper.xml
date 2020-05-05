@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.graduationDesign.dao.PersonnelInformationMapper">
+	<select id="getCountSex" resultType="java.util.Map">
+		select emp_sex as
+		sex,COUNT(emp_sex) as number from pm_employee_information GROUP BY
+		emp_sex
+	</select>
+
+	<select id="getCountNationType" resultType="java.util.Map">
+		select (select
+		type_name from pm_basic_information
+		where
+		id =
+		pm_employee_information.emp_nation_type_id) as
+		nationType,COUNT(emp_nation_type_id) as number from
+		pm_employee_information GROUP BY emp_nation_type_id
+	</select>
+
+	<select id="getCountPoliticalType" resultType="java.util.Map">
+		select (select
+		type_name from
+		pm_basic_information
+		where
+		id =
+		pm_employee_information.emp_political_type_id) as
+		politicalType,COUNT(emp_political_type_id) as number from
+		pm_employee_information GROUP BY emp_political_type_id
+	</select>
+
+	<select id="getCountCultureType" resultType="java.util.Map">
+		select (select
+		type_name from
+		pm_basic_information
+		where
+		id =
+		pm_employee_information.emp_culture_type_id) as
+		cultureType,COUNT(emp_culture_type_id) as number from
+		pm_employee_information GROUP BY emp_culture_type_id
+	</select>
+
+	<select id="getCountWagesType" resultType="java.util.Map">
+		select (select
+		type_name from
+		pm_basic_information
+		where
+		id =
+		pm_employee_information.emp_wages_type_id) as
+		wagesType,COUNT(emp_wages_type_id) as number from
+		pm_employee_information GROUP BY emp_wages_type_id
+	</select>
+
+	<select id="getCountPositionType" resultType="java.util.Map">
+		select (select
+		type_name from
+		pm_basic_information
+		where
+		id =
+		pm_employee_information.emp_position_type_id) as
+		positionType,COUNT(emp_position_type_id) as number from
+		pm_employee_information GROUP BY emp_position_type_id
+	</select>
+
+	<select id="getCountDeptType" resultType="java.util.Map">
+		select (select
+		type_name from
+		pm_basic_information
+		where
+		id = pm_employee_information.emp_dept_type_id) as
+		deptType,COUNT(emp_dept_type_id) as number from
+		pm_employee_information GROUP BY emp_dept_type_id
+	</select>
+</mapper>

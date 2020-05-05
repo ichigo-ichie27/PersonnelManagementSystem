@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+<meta name="viewport"
+	content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta charset="utf-8" />
+<link rel="stylesheet"
+	href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1648417_2yadfk3pvvd.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1648441_39e1ntwx9m2.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1648460_38fuhbspa93.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1648998_zqaf20d4ezr.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1648999_174564zlj3h.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1649000_v7egkzifdjn.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1649008_bc85s1qq2yf.css" />
+<title>基础信息管理-基础信息设置</title>
+</head>
+<style type="text/css">
+body, html {
+	height: 100%;
+}
+
+.container-fluid {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	background-color: #F4F6F8;
+}
+
+.navigation .breadcrumb {
+	background-color: white;
+	border: 1px solid #e7e7e7;
+	border-radius: 0;
+}
+
+table th {
+	text-align: center;
+}
+
+a:hover, a:visited, a:link, a:active {
+	text-decoration: none;
+}
+</style>
+
+<body>
+	<!-- 添加基础信息模态框 -->
+	<div class="modal fade" id="basicAddModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">
+						<i class="iconfont icon-jichuxinxi" style="font-size: 20px"></i>新增基础信息
+					</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal" id="basic_form">
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><i
+								class="iconfont icon-fenleibiaoshi"></i> 分类标识</label>
+							<div class="col-sm-4">
+								<select class="form-control" name="mark" id="basic_add_select">
+									<option th:each="message:${marks}" th:text="${message.mark}"></option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><i
+								class="iconfont icon-zhengzhaoleixingmingcheng"></i> 类型名称</label>
+							<div class="col-sm-8">
+								<input type="text" name="typeName" placeholder="请输入类型名称..." class="form-control" required="required">
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+						<i class="iconfont icon-guanbi"></i>关闭
+					</button>
+					<button type="submit" class="btn btn-primary" form="basic_form">
+						<i class="iconfont icon-baocun"></i>保存
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 编辑基础信息模态框 -->
+	<div class="modal fade" id="basicEditModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">
+						<i class="iconfont icon-xiugai"></i>修改基础信息
+					</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal">
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><i
+								class="iconfont icon-fenleibiaoshi"></i> 分类标识</label>
+							<div class="col-sm-4">
+								<select class="form-control" name="mark"
+									id="basic_update_option">
+									<option th:each="message:${marks}" th:text="${message.mark}"></option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><i
+								class="iconfont icon-zhengzhaoleixingmingcheng"></i> 类型名称</label>
+							<div class="col-sm-8">
+								<input type="text" name="typeName" class="form-control"
+									id="typeName_update_input">
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+						<i class="iconfont icon-guanbi"></i>关闭
+					</button>
+					<button type="button" class="btn btn-primary" id="basic_edit_btn">
+						<i class="iconfont icon-bianji"></i>编辑
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<input type="hidden" id="hidden_data">
+	<div class="container-fluid">
+		<!--面包屑导航-->
+		<div class="navigation">
+			<ol class="breadcrumb">
+				<li><span>基础信息管理</span></li>
+				<li class="active"><a href="basicInformation.html">基础信息设置</a></li>
+			</ol>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				分类标识: <select style="height: 32px;" id="select">
+					<option th:each="message:${marks}" th:text="${message.mark}"></option>
+				</select>
+				<button class="btn btn-info" id="select_btn">
+					<span class="glyphicon glyphicon-search"></span>查询
+				</button>
+				<button class="btn btn-danger pull-right" id="basic_delete_all_btn">
+					<span class="glyphicon glyphicon-trash"></span>删除
+				</button>
+				<button class="btn btn-primary pull-right"
+					style="margin-right: 5px;" id="basic_add_modal_btn">
+					<span class="glyphicon glyphicon-plus-sign"></span>新增
+				</button>
+			</div>
+			<div class="panel-body" style="height: 418px">
+				<!-- 表格数据 -->
+				<table class="table table-hover text-center" id="informations_table">
+					<thead>
+						<tr>
+							<th><input type="checkbox" id="check_all" /></th>
+							<th>序号</th>
+							<th>分类标识</th>
+							<th>类型名称</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+				<input type="hidden" id="hiddenNum">
+				<!-- 分页信息 -->
+				<div id="row">
+					<!-- 分页文字信息 -->
+					<div class="col-md-6" id="page_info_area"></div>
+					<!-- 分页条信息 -->
+					<div class="col-md-6">
+						<nav aria-label="Page navigation" id="page_nav_area"></nav>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/vue.js"></script>
+	<script type="text/javascript"
+		src="static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		//总记录数
+		let totalRecord;
+		//当前页
+		let currentPage;
+
+		let isClick = false;
+
+		$(function() {
+			to_page(1);
+		});
+		
+		function to_page(pageNumber) {
+			$.get("informations", "pageNumber=" + pageNumber).then(
+				function(res) {
+				//1.解析显示员工数据
+				build_informations_table(res);
+				//2.解析显示分页信息
+				build_page_info(res);
+				//3.解析显示分页条信息
+				build_page_nav(res);
+			});
+		}
+		
+		//查询
+		$("#select_btn").click(function() {
+			isClick = true;
+			let data = $("#select option:selected").val();
+			Page_turning(1, data);
+			$("#hidden_data").val(data);
+		});
+		
+		function Page_turning(pageNum, data) {
+			$.get("informations",
+					"pageNumber=" + pageNum + '&' + "data=" + data).then(
+					function(res) {
+						//1.解析显示员工数据
+						build_informations_table(res);
+						//2.解析显示分页信息
+						build_page_info(res);
+						//3.解析显示分页条信息
+						build_page_nav(res);
+					});
+		}
+		
+
+		//解析员工数据
+		function build_informations_table(res) {
+			$("#informations_table tbody").empty();
+			let informations = res.extend.pageInfo.list;
+			$.each(informations, function(index, items) {
+				let checkBoxTd = $("<td></td>").append(
+						"<input type='checkbox' class='check_item'/>");
+				let idTd = $("<td></td>").append(items.id);
+				let markTd = $("<td></td>").append(items.mark);
+				let typeNameTd = $("<td></td>").append(items.typeName);
+				let editBtn = $("<button></button>").addClass(
+						"btn btn-primary btn-sm edit_btn").append(
+						$("<span></span>")).addClass(
+						"glyphicon glyphicon-pencil").append("编辑");
+				//为编辑按钮添加一个自定义的属性，来表示当前员工id
+				editBtn.attr("edit_id", items.id);
+				let delBtn = $("<button></button>").addClass(
+						"btn btn-danger btn-sm delete_btn").append(
+						$("<span></span>")).addClass(
+						"glyphicon glyphicon-trash").append("删除");
+				//为删除按钮添加一个自定义属性，表示当前员工id
+				delBtn.attr("delete_id", items.id);
+				let btnTd = $("<td></td>").append(editBtn).append(" ").append(
+						delBtn);
+				$("<tr></tr>").append(checkBoxTd).append(idTd).append(markTd)
+						.append(typeNameTd).append(btnTd).appendTo(
+								"#informations_table tbody");
+			});
+		}
+
+		//2.解析分页信息
+		function build_page_info(res) {
+			$("#page_info_area").empty();
+			$("#page_info_area").append(
+					"当前第" + res.extend.pageInfo.pageNum + "页,共"
+							+ res.extend.pageInfo.pages + "页,总"
+							+ res.extend.pageInfo.total + "条记录");
+			totalRecord = res.extend.pageInfo.pages;
+			currentPage = res.extend.pageInfo.pageNum;
+		}
+
+		//3.解析分页条信息
+		function build_page_nav(res) {
+			$("#page_nav_area").empty();
+			let ul = $("<ul></ul>").addClass("pagination navbar-right");
+			//上一页
+			let previous = $("<li></li>")
+					.append($("<a></a>").append("&laquo;"));
+			//判断是否还有上一页，没有就将链接禁用
+			if (res.extend.pageInfo.hasPreviousPage === false) {
+				previous.addClass("disabled");
+			} else {
+				previous.click(function() {
+					if(isClick === false){
+						to_page(res.extend.pageInfo.pageNum - 1);
+					}else{
+						Page_turning(res.extend.pageInfo.pageNum - 1,$("#hidden_data").val());
+					}
+					
+				});
+			}
+			ul.append(previous);
+
+			//页码
+			let navigatepageNums = res.extend.pageInfo.navigatepageNums;
+			$.each(navigatepageNums, function(index, items) {
+				let pageNumber = $("<li></li>").append(
+						$("<a></a>").append(items));
+				//判断当前页码是否等于分页条的页码
+				if (res.extend.pageInfo.pageNum === items) {
+					//给页码添加高亮
+					pageNumber.addClass("active");
+				}
+				//给页码添加点击事件
+				pageNumber.click(function() {
+					if(isClick === false){
+						to_page(items);
+					}else{
+						Page_turning(items,$("#hidden_data").val());
+					}
+					
+				});
+				ul.append(pageNumber);
+			});
+
+			//下一页
+			let next = $("<li></li>").append($("<a></a>").append("&raquo;"));
+			//判断是否还有下一页，没有就将链接禁用
+			if (res.extend.pageInfo.hasNextPage === false) {
+				next.addClass("disabled");
+			} else {
+				next.click(function() {
+					if(isClick === false){
+						to_page(res.extend.pageInfo.pageNum + 1);
+					}else{
+						Page_turning(res.extend.pageInfo.pageNum + 1,$("#hidden_data").val());
+					}
+				});
+			}
+			ul.append(next).appendTo("#page_nav_area");
+		}
+
+		//打开新增基础信息模态框
+		$("#basic_add_modal_btn").click(function() {
+			//清空表单数据
+			$("#basicAddModal form")[0].reset();
+			$("#basicAddModal").modal({
+				backdrop : "static"
+			});
+		});
+
+		//保存新增基础信息
+		$("#basic_form").submit(
+				function() {
+					$.post("addbasicInfor",
+							$("#basicAddModal form").serialize()).then(
+							function(res) {
+								if (res.code === 200) {
+									//关闭模态框
+									$("#basicAddModal").modal("hide");
+									//显示最后一页数据
+									if(isClick === false){
+										to_page(totalRecord);
+									}else{
+										Page_turning(totalRecord,$("#hidden_data").val());
+									}
+									
+								}
+							});
+					return false;
+				});
+
+		//给修改按钮添加点击事件，打开模态框
+		$(document).on("click", ".edit_btn", function() {
+			//1.点击编辑按钮之前先通过id查出基础信息并显示在模态框中
+			getBasicInformation($(this).attr("edit_id"));
+			//2.在弹出模态框之前把id传递给模态框的修改按钮  以并能修改几号数据的信息
+			$("#basic_edit_btn").attr("edit_btn", $(this).attr("edit_id"));
+			//3.点击编辑按钮弹出模态框
+			$("#basicEditModal").modal({
+				backdrop : "static"
+			});
+		});
+
+		//通过id查询数据
+		function getBasicInformation(id) {
+			$.get("basicId", "id=" + id).then(function(res) {
+				let infor = res.extend.information;
+				$("#basic_update_option").val([ infor[0].mark ]);
+				$("#typeName_update_input").val(infor[0].typeName);
+			});
+		}
+
+		//点击修改
+		$("#basic_edit_btn").click(function() {
+			$.ajax({
+				url : "updateBasicInfor/" + $(this).attr("edit_btn"),
+				data : $("#basicEditModal form").serialize(),
+				type : "PUT",
+				success : function(res) {
+					$("#basicEditModal").modal("hide");
+					if(isClick === false){
+						to_page(currentPage);
+					}else{
+						Page_turning(currentPage,$("#hidden_data").val());
+					}
+					
+				}
+			});
+		});
+
+		//删除基础信息
+		$(document).on(
+				"click",
+				".delete_btn",
+				function() {
+					let mark = $(this).parents("tr").find("td:eq(2)").text();
+					let typeName = $(this).parents("tr").find("td:eq(3)")
+							.text();
+					if (confirm("确认删除 分类标识:【" + mark + "】类型名称:【" + typeName
+							+ "】这条数据吗?")) {
+						$.ajax({
+							url : "deleteBasicInfor/"
+									+ $(this).attr("delete_id"),
+							type : "DELETE",
+							success : function(res) {
+								if(isClick === false){
+									to_page(currentPage);
+								}else{
+									Page_turning(currentPage,$("#hidden_data").val());
+								}
+								
+							}
+						});
+					}
+				});
+
+		//给全选单选框添加点击事件
+		$("#check_all").click(function() {
+			$(".check_item").prop("checked", $(this).prop("checked"));
+		});
+
+		//给单选框添加事件
+		$(document)
+				.on(
+						"click",
+						".check_item",
+						function() {
+							let flag = $(".check_item:checked").length === $(".check_item").length;
+							$("#check_all").prop("checked", flag);
+						});
+
+		//批量删除基础信息
+		$("#basic_delete_all_btn").click(function() {
+			let id = "";
+			$.each($(".check_item:checked"), function() {
+				id += $(this).parents("tr").find("td:eq(1)").text() + ",";
+			});
+			id = id.substring(0, id.length - 1);
+			if (confirm("确认删除【" + id + "】号数据吗？")) {
+				$.ajax({
+					url : "batchDeleteBasicInfor/" + id,
+					type : "DELETE",
+					success : function(res) {
+						if(isClick === false){
+							to_page(currentPage);
+						}else{
+							Page_turning(currentPage,$("#hidden_data").val());
+						}
+						$("#check_all").prop("checked", false);
+					}
+				});
+			}
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.graduationDesign.dao.WorkExperienceMapper">
+	<select id="getEmpWorkExperience" resultType="WorkExperience">
+		select
+		id,work_company,dept,position,start_time,end_time from
+		pm_work_experience where
+		emp_id in (select id from
+		pm_employee_information where id = #{id})
+	</select>
+
+	<select id="getStaffInfoById" resultType="WorkExperience">
+		select * from
+		pm_work_experience where id = #{id}
+	</select>
+
+	<insert id="addWorkExperience">
+		insert into pm_work_experience
+		(emp_id,work_company,dept,position,start_time,end_time) values
+		(#{empId},#{workCompany},#{dept},#{position},#{startTime},#{endTime})
+	</insert>
+
+	<update id="editStaffInfoById">
+		update pm_work_experience set work_company =
+		#{workCompany},dept = #{dept}
+		,position = #{position},start_time =
+		#{startTime},end_time = #{endTime} where id = #{id}
+	</update>
+	
+	<delete id="moveStaffWorkInfo">
+		delete from pm_work_experience where id = #{id}
+	</delete>
+	
+</mapper>

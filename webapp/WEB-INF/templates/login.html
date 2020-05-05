@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport"
+	content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta charset="utf-8" />
+<title>人事管理系统-后台登录</title>
+<link rel="stylesheet"
+	href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1705467_l21p6bci5bl.css" />
+
+</head>
+<style>
+.header {
+	height: 50px;
+	background: black;
+}
+
+.foot {
+	height: 50px;
+	background: black;
+	margin-top: 66px;
+}
+
+.word_text {
+	color: black;
+	text-align: center;
+	font-style: italic;
+	text-shadow: 0.1em 0.1em 0.02em #C1C1C1;
+}
+
+.error {
+	color: red;
+}
+</style>
+<body>
+	<div class="container-fluid">
+		<div class="row header"></div>
+		<div class="row" style="margin-top: 50px;">
+			<div class="col-md-offset-4 col-md-4">
+				<h1 class="word_text">人事管理系统</h1>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-offset-2 col-md-4">
+				<h3>PERSONNEL MANAGEMENT</h3>
+				<hr />
+				<p>
+				<ol type="1">
+					<li><h4>人事综合管理工作的网络化...</h4></li>
+					<li><h4>促进企业人事综合管理工作的规范化...</h4></li>
+					<li><h4>设计结合企业人事管理的特点，本着实用...</h4></li>
+					<li><h4>快捷高效的人事管理真正的解放你的...</h4></li>
+					<li><h4>简洁时尚的界面让你轻松工作每一天...</h4></li>
+				</ol>
+				</p>
+				<p>
+					<a class="btn" href="#">使用说明 »</a> <a class="btn" href="#"
+						style="margin-left: 150px;">法律声明 »</a>
+				</p>
+			</div>
+			<div class="col-md-4" id="right">
+				<h3>用户登录</h3>
+				<hr />
+				<p style="color: red;" id="error">
+				<p>
+				<form id="login_form" class="form-horizontal" role="form">
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-2 control-label"> <span
+							class="glyphicon glyphicon-user" aria-hidden="true"></span>
+						</label>
+						<div class="col-sm-9">
+							<input type="text" class="form-control name" name="userName"
+								placeholder="用户名" required="required" autoComplete="off"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="inputPassword3" class="col-sm-2 control-label">
+							<span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
+						</label>
+						<div class="col-sm-9">
+							<div class="input-group">
+								<input type="password" class="form-control"
+									placeholder="密码" name="password" id="pass_word"
+									required="required"> <span class="input-group-btn">
+									<button class="btn btn-default" type="button">
+										<span class="glyphicon glyphicon-eye-open" id="eye_open"></span>
+									</button>
+								</span>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="inputPassword3" class="col-sm-2 control-label">
+							<span class="glyphicon glyphicon-check" aria-hidden="true"></span>
+						</label>
+						<div class="col-sm-5">
+							<input type="text" class="form-control identify" name="identify"
+								placeholder="验证码" required="required" autoComplete="off"/> <input
+								type="hidden" id="identifyCode"
+								th:value="${session.identifyCode}">
+						</div>
+						<div class="col-sm-4">
+							<img src="generate.png"
+								onclick="this.src=this.src+'?'+Math.random()" height="35"
+								width="110" />
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<div class="checkbox">
+								<label><input type="radio" name="check" value="1" />管理员</label>
+								<label><input type="radio" name="check" value="2" />领导</label>
+								<label><input type="radio" name="check" checked
+									value="3" />员工</label> <span class="error" id="checkUserType"></span>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<button id="form_btn" type="submit" class="btn btn-default" style="width:288px">
+								<span class="iconfont icon-denglu"></span>登录
+							</button>	
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="col-md-2"></div>
+		</div>
+		<div class="row foot">
+			<div class="col-md-offset-4 col-md-4">
+				<h5 style="text-align: center; line-height: 30px; color: white;">Copyright©
+					2019 人事管理系统 @LC</h5>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/vue.js"></script>
+	<script type="text/javascript"
+		src="static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	<script>
+		$("#login_form").submit(function(evt) {
+			evt.preventDefault();
+			$.post("userLogin", $(this).serialize()).then(function(res) {
+				//console.log(res);
+				if (res.code === 200&&res.extend.userInfo.userIsStart === "是") {
+					window.location.href = "home";
+				} else {
+					$("#error").text("当前用户不存在或账号已被禁用");
+				}
+			});
+		});
+
+		//鼠标移入眼睛显示明文密码
+		$("#eye_open").mouseover(
+				function() {
+					$("#pass_word").attr("type", "text");
+					$("#eye_open").removeClass("glyphicon-eye-open").addClass(
+							"glyphicon-eye-close");
+				});
+
+		//鼠标移出眼睛显示闭文密码
+		$("#eye_open").mouseout(
+				function() {
+					$("#pass_word").attr("type", "password");
+					$("#eye_open").removeClass("glyphicon-eye-close").addClass(
+							"glyphicon-eye-open");
+				});
+	</script>
+</body>
+</html>

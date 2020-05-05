@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport"
+	content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta charset="utf-8" />
+<title>人事管理系统</title>
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1631777_1uznq3irphd.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1631780_ix1ga3ijghh.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1631781_8gfe4ilzjv9.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1631783_93713720jol.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1631784_m5546mudd4.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1631790_zg1oid9a0xf.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1631791_wly9s22b4tl.css" />
+<link rel="stylesheet"
+	href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css" />
+</head>
+<style>
+body, html {
+	height: 100%;
+	overflow: hidden;
+}
+/*div{
+			border:1px solid hotpink;
+		}*/
+body, ul {
+	margin: 0;
+	padding: 0;
+}
+
+.container-fluid {
+	padding-left: 0;
+	padding-right: 0;
+	height: 100%;
+}
+
+/*导航栏*/
+.navbar>.nav>li>a {
+	color: white;
+}
+
+.nav span {
+	font-size: 1.04em;
+}
+
+#icon-off {
+	font-size: 22px;
+}
+
+/*左侧手风琴菜单栏*/
+.row-two {
+	height: 100%;
+	background-color: #F4F6F8;
+}
+
+.row {
+	margin: 0;
+}
+
+a:hover, a:visited, a:link, a:active {
+	text-decoration: none;
+}
+
+.menu {
+	padding: 0;
+	background: #292929;
+	/*background: gray;*/
+	height: 100%;
+	transition: all .3s;
+	margin-top: 15px;
+}
+
+li {
+	list-style: none;
+}
+
+.nav-left span {
+	font-size: 1.04em;
+}
+
+.nav-left {
+	position: relative;
+	display:none;
+}
+
+.nav-left a {
+	display: block;
+	overflow: hidden;
+	padding-left: 15px;
+	line-height: 46px;
+	max-height: 46px;
+	color: #DEE1E6;
+	transition: all .3s;
+}
+
+.nav-left>a:before {
+	content: "";
+	position: absolute;
+	left: 0px;
+	width: 2.5px;
+	height: 46px;
+	background: #34A0CE;
+	opacity: 0;
+	transition: all .3s;
+}
+
+.nav-left>ul {
+	display: none;
+	background: #4e4e4e;
+}
+
+.nav-show a:before, .nav-left>a:hover:before {
+	opacity: 1;
+}
+
+.nav-left>a:hover {
+	color: #fff;
+	background: #222222;
+}
+
+.nav-left li:hover a {
+	color: #FFF;
+	background: black;
+}
+
+.nav-left>a>.nav-icon {
+	font-size: 20px;
+}
+
+.nav-left>a>span {
+	padding-left: 10px;
+}
+
+.nav-left>ul>li>a>span {
+	padding-left: 31px;
+}
+
+.nav-left>a>.glyphicon-menu-right {
+	float: right;
+	margin-right: 20px;
+	margin-top: 14px;
+	transition: transform .3s;
+}
+
+.nav-show .glyphicon-menu-right {
+	transform: rotate(90deg);
+}
+
+/*右侧主内容*/
+.col-md-10 {
+	height: 100%;
+	margin-top: 15px;
+}
+
+.col-md-10 iframe {
+	background: #292929;
+}
+</style>
+
+<body>
+	<div class="container-fluid">
+		<!--导航条-->
+		<nav class="navbar navbar-inverse navbar-static-top"
+			style="margin-bottom: 0;">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#menu-bar">
+					<span class="sr-only"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span>
+				</button>
+				<a href="" class="navbar-brand" style="color: white;">人事管理系统</a>
+			</div>
+			<ul class="nav navbar-nav navbar-right" style="margin-right: 10px;">
+				<li><a><span><span class="glyphicon glyphicon-user"></span>
+							欢迎用户:<span th:text="${session.userName}"></span></span> </a></li>
+				<li><a><span>角色:<span id="role"
+							th:text="${session.role}"></span></span> </a></li>
+				<li><a><span id="current"></span></a></li>
+				<li><a href="signOut" id="log-off"> <i id="icon-off"
+						class="glyphicon glyphicon-off"></i>
+				</a></li>
+			</ul>
+		</nav>
+		<!--左侧菜单栏-->
+		<div class="row row-two">
+			<div class="col-md-2 menu" id="menu-bar">
+				<ul th:each="moduleId:${session.moduleIds}">
+					<li class="nav-left"  th:style="${moduleId==1}?'display:block':''"><a href="javascript:;"> <i
+							class="nav-icon iconfont icon-jichuxinxiguanli"></i> <span>基础信息管理</span>
+							<i class="glyphicon glyphicon-menu-right"></i>
+					</a>
+						<ul>
+							<li><a href="basicInformation.html" target="mainContent"><span>基础信息设置</span></a>
+							</li>
+						</ul></li>
+					<li class="nav-left" th:style="${moduleId==2}?'display:block':''"><a href="javascript:;"> <i
+							class="nav-icon iconfont icon-hrrenshirenshiguanli380"></i> <span>人事管理</span>
+							<i class="glyphicon glyphicon-menu-right"></i>
+					</a>
+						<ul>
+							<li><a href="partEmployeeInformation.html"
+								target="mainContent"><span>人事档案浏览</span></a></li>
+							<li><a href="personnelInformation.html" target="mainContent"><span>人事信息统计</span></a>
+							</li>
+						</ul></li>
+					<li class="nav-left" th:style="${moduleId==3}?'display:block':''"><a href="javascript:;"> <i
+							class="nav-icon iconfont icon-kaoqinguanli"></i> <span>考勤管理</span>
+							<i class="glyphicon glyphicon-menu-right"></i>
+					</a>
+						<ul>
+							<li><a href="attendanceRecord.html" target="mainContent"><span>考勤记录</span></a>
+							</li>
+						</ul></li>
+					<li  class="nav-left" th:style="${moduleId==4}?'display:block':''"><a href="javascript:;"> <i
+							class="nav-icon iconfont icon-gongziguanli"></i> <span>工资管理</span>
+							<i class="glyphicon glyphicon-menu-right"></i>
+					</a>
+						<ul>
+							<li><a href="wagesRecord.html" target="mainContent"><span>工资记录</span></a>
+							</li>
+						</ul></li>
+					<li  class="nav-left" th:style="${moduleId==5}?'display:block':''"><a href="javascript:;"> <i
+							class="nav-icon iconfont icon-xitongguanli"></i> <span>系统管理</span>
+							<i class="glyphicon glyphicon-menu-right"></i>
+					</a>
+						<ul>
+							<li><a href="user.html" target="mainContent"><span>用户管理</span></a>
+							</li>
+							<li><a href="authority.html" target="mainContent"><span>权限管理</span></a>
+							</li>
+							<li><a href="journal.html" target="mainContent"><span>系统操作日志</span></a>
+							</li>
+						</ul></li>
+					<li class="nav-left" th:style="${moduleId==6}?'display:block':''"><a href="javascript:;"> <i
+							class="nav-icon iconfont icon-yuangongkaoqin"></i> <span>员工考勤</span>
+							<i class="glyphicon glyphicon-menu-right"></i>
+					</a>
+						<ul>
+							<li><a href="clockIn.html" target="mainContent"><span>上下班打卡</span></a>
+							</li>
+						</ul></li>
+					<li class="nav-left" th:style="${moduleId==7}?'display:block':''"><a href="javascript:;"> <i
+							class="nav-icon iconfont icon-gerenxinxi"></i> <span>个人信息中心</span>
+							<i class="glyphicon glyphicon-menu-right"></i>
+					</a>
+						<ul>
+							<li><a href="userInformation.html" target="mainContent"><span>个人信息设置</span></a>
+							</li>
+							<li><a href="changePassword.html" target="mainContent"><span>修改密码</span></a>
+							</li>
+						</ul></li>
+				</ul>
+			</div>
+			<!--右边主内容-->
+			<div class="col-md-10">
+				<iframe src="welcome" name="mainContent" scrolling="yes"
+					frameborder="0" height="90%" width="100%">我的桌面</iframe>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/vue.js"></script>
+	<script type="text/javascript"
+		src="static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	<script>
+		//导航条日期
+		function displayTime() {
+			let timestamp = new Date();
+			let dynamicDate = ((timestamp.getFullYear()) + '年'
+					+ change(timestamp.getMonth() + 1) + '月'
+					+ change(timestamp.getDate()) + '日 '
+					+ '星期' + '日一二三四五六'
+					.charAt(timestamp.getDay())+" "
+					+ change(timestamp.getHours()) + ':'
+					+ change(timestamp.getMinutes()) + ':'
+					+ change(timestamp.getSeconds()));
+			function change(t) {
+				if (t < 10) {
+					return "0" + t;
+				} else {
+					return t;
+				}
+			}
+			return dynamicDate;
+		}
+		setInterval(function() {
+			$("#current").text(displayTime());
+		}, 0);
+
+		//左侧菜单栏
+		$(".nav-left>a").on(
+				'click',
+				function() {
+					if ($(this).next().css('display') == "none") {
+						//点击其他标签让当前打开的收缩
+						$('.nav-left').children('ul').slideUp(300);
+						//点击当前标签让其展开
+						$(this).next('ul').slideDown(300);
+						//给当前被点击的标签添加样式并删除当前被点击标签的所有同级标签的样式 
+						$(this).parent('li').parent("ul").addClass('nav-show').siblings('ul').removeClass('nav-show');
+					} else {
+						//点击当前标签让其收缩
+						$(this).next('ul').slideUp(300);
+						//删除当前被点击标签的样式
+						$(this).parent('li').parent('ul').removeClass('nav-show');
+					}
+				});
+			
+		$("#log-off").click(function() {
+			if (confirm("确认要注销吗？")) {
+				return true;
+			}
+			return false;
+		});
+
+		if ($("#role").text() === '1') {
+			$("#role").text("管理员");
+		} else if ($("#role").text() === '2') {
+			$("#role").text("人事经理");
+		} else {
+			$("#role").text("员工");
+		}
+	</script>
+</body>
+
+</html>

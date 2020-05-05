@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport"
+	content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta charset="utf-8" />
+<link rel="stylesheet"
+	href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css" />
+<title>人事管理-人事信息统计</title>
+</head>
+<style type="text/css">
+body, html {
+	height: 100%;
+}
+
+.container-fluid {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	background-color: #F4F6F8;
+}
+
+.navigation .breadcrumb {
+	background-color: white;
+	border: 1px solid #e7e7e7;
+	border-radius: 0;
+}
+
+a:hover, a:visited, a:link, a:active {
+	text-decoration: none;
+}
+</style>
+
+<body>
+	<div class="container-fluid">
+		<!--面包屑导航-->
+		<div class="navigation">
+			<ol class="breadcrumb">
+				<li><span>人事管理</span></li>
+				<li class="active"><a href="personnelInformation.html">人事信息统计</a></li>
+			</ol>
+		</div>
+		<!--面板-->
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<div class="row">
+					<div class="col-md-6" id="sex_table" style="height: 300px;"></div>
+					<div class="col-md-6" id="nationType_table" style="height: 300px;"></div>
+				</div>
+				<div class="row">
+					<div class="col-md-6" id="politicalType_table"
+						style="height: 300px;"></div>
+					<div class="col-md-6" id="cultureType_table" style="height: 300px;"></div>
+				</div>
+				<div class="row">
+					<!-- <div class="col-md-6" id="wagesType_table" style="height: 300px;"></div> -->
+					<div class="col-md-6" id="positionType_table"
+						style="height: 300px;"></div>
+					<div class="col-md-6" id="deptType_table" style="height: 300px;"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/vue.js"></script>
+	<script type="text/javascript"
+		src="static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="js/echarts.min.js"></script>
+	<script>
+		let sexChart = echarts.init(document.getElementById('sex_table'));
+		sexChart.setOption({
+			//标题设置
+			title:{
+				text:'男女人数占比统计',
+				x:'center'
+			},
+			//提示框设置
+			tooltip:{
+				trigger:'item',
+				 // formatter设置提示框显示内容
+	            // {a}指series.name  {b}指series.data的name
+	            // {c}指series.data的value  {d}%指这一部分占总数的百分比
+				formatter:"{a} <br/>{b} : {c}人 ({d}%)"
+			},
+			//图例设置
+			legend:{
+				orient:'vertical',
+				left:'left',
+				data:[]
+			},
+			//值域设置
+			series:[
+				{
+					name:'性别',
+					type:'pie',
+					radius:'55%',
+					center:['50%','50%'],
+					data:[],
+					itemStyle:{
+						normal:{
+							label:{
+								show:true,
+								formatter:'{b}({d}%)'
+							},
+							labelLine:{
+								show:true
+							}
+						}
+					}
+				}
+			]
+		});
+		sexChart.showLoading(); 
+		let legendSexData = [];
+		let seriesSexData = [];
+		$.get("countSex").then(function(res) {
+			if(res.code === 200){
+				let countSexData = res.extend.countSex;
+				$.each(countSexData,function(index,res){
+					legendSexData.push(res.sex);
+					let obj = new Object();
+					obj.name = res.sex;
+					obj.value = res.number;
+					seriesSexData.push(obj);
+				});
+				sexChart.hideLoading();
+				sexChart.setOption({
+					legend:{
+						data:legendSexData
+					},
+					series:{
+						data:seriesSexData
+					}
+				});
+			}
+		});	
+	</script>
+	<script>
+		let nationChart = echarts.init(document.getElementById('nationType_table'));
+		nationChart.setOption({
+			//设置标题
+			title:{
+				text:'各民族人数占比统计',
+				x:'center'
+			},
+			//图例设置
+			legend:{
+				orient:'vertical',
+				left:'left',
+				data:[]
+			},
+			//值域设置
+			series:[
+				{
+					name:'民族',	
+					type:'pie',
+					radius:'55%',
+					center:['50%','50%'],
+					data:[],
+					itemStyle:{
+						normal:{
+							label:{
+								show:true,
+								formatter:'{b}({d}%)'
+							},
+							labelLine:{
+								show:true
+							}
+						}
+					}
+				}
+			],
+			//提示框设置
+			tooltip:{
+				trigger:'item',
+				formatter:'{a} <br/>{b} : {c}人 ({d}%)'
+			}
+		});
+		nationChart.showLoading();
+		let legendNationData = [];
+		let seriesNationData = [];
+		$.get("countNation").then(function(res){
+			if(res.code === 200){
+				let countNationData = res.extend.countNation;
+				$.each(countNationData,function(index,res){
+					legendNationData.push(res.nationType);
+					let obj = new Object();
+					obj.name = res.nationType;
+					obj.value = res.number;
+					seriesNationData.push(obj);
+				});
+				nationChart.hideLoading();
+				nationChart.setOption({
+					legend:{
+						data:legendNationData
+					},
+					series:{
+						data:seriesNationData
+					}
+				});
+			}
+		});
+	</script>
+	<script>
+		let politicalChart = echarts.init(document.getElementById('politicalType_table'));
+		politicalChart.setOption({
+			//设置标题
+			title:{
+				text:'政治面貌人数占比统计',
+				x:'center'
+			},
+			//图例设置
+			legend:{
+				orient:'vertical',
+				left:'left',
+				data:[]
+			},
+			//值域设置
+			series:[
+				{
+					name:'政治面貌',	
+					type:'pie',
+					radius:'55%',
+					center:['50%','50%'],
+					data:[],
+					itemStyle:{
+						normal:{
+							label:{
+								show:true,
+								formatter:'{b}({d}%)'
+							},
+							labelLine:{
+								show:true
+							}
+						}
+					}
+				}
+			],
+			//提示框设置
+			tooltip:{
+				trigger:'item',
+				formatter:'{a} <br/>{b} : {c}人 ({d}%)'
+			}
+		});
+		politicalChart.showLoading();
+		let legendPoliticalData = [];
+		let seriesPoliticalData = [];
+		$.get("countPolitical").then(function(res){
+			if(res.code === 200){
+				let countPoliticalData = res.extend.countPolitical;
+				$.each(countPoliticalData,function(index,res){
+					legendPoliticalData.push(res.politicalType);
+					let obj = new Object();
+					obj.name = res.politicalType;
+					obj.value = res.number;
+					seriesPoliticalData.push(obj);
+				});
+				politicalChart.hideLoading();
+				politicalChart.setOption({
+					legend:{
+						data:legendPoliticalData
+					},
+					series:{
+						data:seriesPoliticalData
+					}
+				});
+			}
+		});
+	</script>
+	<script>
+		let cultureChart = echarts.init(document.getElementById('cultureType_table'));
+		cultureChart.setOption({
+			//设置标题
+			title:{
+				text:'文化程度人数占比统计',
+				x:'center'
+			},
+			//图例设置
+			legend:{
+				orient:'vertical',
+				left:'left',
+				data:[]
+			},
+			//值域设置
+			series:[
+				{
+					name:'文化程度',	
+					type:'pie',
+					radius:'55%',
+					center:['50%','50%'],
+					data:[],
+					itemStyle:{
+						normal:{
+							label:{
+								show:true,
+								formatter:'{b}({d}%)'
+							},
+							labelLine:{
+								show:true
+							}
+						}
+					}
+				}
+			],
+			//提示框设置
+			tooltip:{
+				trigger:'item',
+				formatter:'{a} <br/>{b} : {c}人 ({d}%)'
+			}
+		});
+		cultureChart.showLoading();
+		let legendCultureData = [];
+		let seriesCultureData = [];
+		$.get("countCulture").then(function(res){
+			if(res.code === 200){
+				let countCultureData = res.extend.countCulture;
+				$.each(countCultureData,function(index,res){
+					legendCultureData.push(res.cultureType);
+					let obj = new Object();
+					obj.name = res.cultureType;
+					obj.value = res.number;
+					seriesCultureData.push(obj);
+				});
+				cultureChart.hideLoading();
+				cultureChart.setOption({
+					legend:{
+						data:legendCultureData
+					},
+					series:{
+						data:seriesCultureData
+					}
+				});
+			}
+		});
+	</script>
+	<!-- <script>
+		let wagesChart = echarts.init(document.getElementById('wagesType_table'));
+		wagesChart.setOption({
+			//设置标题
+			title:{
+				text:'工资类型人数占比统计',
+				x:'center'
+			},
+			//图例设置
+			legend:{
+				orient:'vertical',
+				left:'left',
+				data:[]
+			},
+			//值域设置
+			series:[
+				{
+					name:'工资类型',	
+					type:'pie',
+					radius:'55%',
+					center:['50%','50%'],
+					data:[],
+					itemStyle:{
+						normal:{
+							label:{
+								show:true,
+								formatter:'{b}({d}%)'
+							},
+							labelLine:{
+								show:true
+							}
+						}
+					}
+				}
+			],
+			//提示框设置
+			tooltip:{
+				trigger:'item',
+				formatter:'{a} <br/>{b} : {c}人 ({d}%)'
+			}
+		});
+		wagesChart.showLoading();
+		let legendWagesData = [];
+		let seriesWagesData = [];
+		$.get("countWages").then(function(res){
+			if(res.code === 200){
+				let countWagesData = res.extend.countWages;
+				$.each(countWagesData,function(index,res){
+					legendWagesData.push(res.wagesType);
+					let obj = new Object();
+					obj.name = res.wagesType;
+					obj.value = res.number;
+					seriesWagesData.push(obj);
+				});
+				wagesChart.hideLoading();
+				wagesChart.setOption({
+					legend:{
+						data:legendWagesData
+					},
+					series:{
+						data:seriesWagesData
+					}
+				});
+			}
+		});
+	</script> -->
+	<script>
+		let positionChart = echarts.init(document.getElementById('positionType_table'));
+		positionChart.setOption({
+			//设置标题
+			title:{
+				text:'各职位人数占比统计',
+				x:'center'
+			},
+			//图例设置
+			legend:{
+				orient:'vertical',
+				left:'left',
+				data:[]
+			},
+			//值域设置
+			series:[
+				{
+					name:'职位',	
+					type:'pie',
+					radius:'55%',
+					center:['50%','50%'],
+					data:[],
+					itemStyle:{
+						normal:{
+							label:{
+								show:true,
+								formatter:'{b}({d}%)'
+							},
+							labelLine:{
+								show:true
+							}
+						}
+					}
+				}
+			],
+			//提示框设置
+			tooltip:{
+				trigger:'item',
+				formatter:'{a} <br/>{b} : {c}人 ({d}%)'
+			}
+		});
+		positionChart.showLoading();
+		let legendPositionData = [];
+		let seriesPositionData = [];
+		$.get("countPosition").then(function(res){
+			if(res.code === 200){
+				let countPositionData = res.extend.countPosition;
+				$.each(countPositionData,function(index,res){
+					legendPositionData.push(res.positionType);
+					let obj = new Object();
+					obj.name = res.positionType;
+					obj.value = res.number;
+					seriesPositionData.push(obj);
+				});
+				positionChart.hideLoading();
+				positionChart.setOption({
+					legend:{
+						data:legendPositionData
+					},
+					series:{
+						data:seriesPositionData
+					}
+				});
+			}
+		});
+	</script>
+	<script>
+		let deptChart = echarts.init(document.getElementById('deptType_table'));
+		deptChart.setOption({
+			//设置标题
+			title:{
+				text:'各部门人数占比统计',
+				x:'center'
+			},
+			//图例设置
+			legend:{
+				orient:'vertical',
+				left:'left',
+				data:[]
+			},
+			//值域设置
+			series:[
+				{
+					name:'部门',	
+					type:'pie',
+					radius:'55%',
+					center:['50%','50%'],
+					data:[],
+					itemStyle:{
+						normal:{
+							label:{
+								show:true,
+								formatter:'{b}({d}%)'
+							},
+							labelLine:{
+								show:true
+							}
+						}
+					}
+				}
+			],
+			//提示框设置
+			tooltip:{
+				trigger:'item',
+				formatter:'{a} <br/>{b} : {c}人 ({d}%)'
+			}
+		});
+		deptChart.showLoading();
+		let legendDeptData = [];
+		let seriesDeptData = [];
+		$.get("countDept").then(function(res){
+			if(res.code === 200){
+				let countDeptData = res.extend.countDept;
+				$.each(countDeptData,function(index,res){
+					legendDeptData.push(res.deptType);
+					let obj = new Object();
+					obj.name = res.deptType;
+					obj.value = res.number;
+					seriesDeptData.push(obj);
+				});
+				deptChart.hideLoading();
+				deptChart.setOption({
+					legend:{
+						data:legendDeptData
+					},
+					series:{
+						data:seriesDeptData
+					}
+				});
+			}
+		});
+	</script>
+</body>
+
+</html>

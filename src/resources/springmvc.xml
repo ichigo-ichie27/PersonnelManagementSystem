@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+
+	<!--=======================springMVC的配置========================== -->
+	<!-- 扫描aop包的注解 -->
+	<context:component-scan
+		base-package="com.graduationDesign.aop" />
+	<!--代理方案有两种，spring框架默认情况下，会对有接口的类使用jdk代理；没有接口的类使用cglib代理。 Proxy-target-class的值默认是false,它代表使用jdk方式进行动态代理。 -->
+	<!--开启aspectj support -->
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+
+	<context:component-scan
+		base-package="com.graduationDesign" use-default-filters="false">
+		<!-- 只扫描控制器 -->
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+
+	<!-- 配置thymeleaf模板解析器 -->
+	<bean id="springResourceTemplateResolver"
+		class="org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver">
+		<property name="prefix" value="/WEB-INF/templates/" />
+		<property name="suffix" value=".html" />
+		<property name="characterEncoding" value="UTF-8" />
+		<property name="order" value="1" />
+		<property name="templateMode" value="HTML5" />
+		<property name="cacheable" value="false" />
+	</bean>
+	<!-- 配置thymeleaf模板引擎 -->
+	<bean id="springTemplateEngine"
+		class="org.thymeleaf.spring5.SpringTemplateEngine">
+		<property name="templateResolver"
+			ref="springResourceTemplateResolver" />
+	</bean>
+	<!-- 配置thymeleaf视图解析器 -->
+	<bean id="viewResolver"
+		class="org.thymeleaf.spring5.view.ThymeleafViewResolver">
+		<property name="templateEngine" ref="springTemplateEngine" />
+		<property name="characterEncoding" value="UTF-8" />
+	</bean>
+
+	<!-- 配置文件上传解析器MultipartResolver -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- 设置默认编码 -->
+		<property name="defaultEncoding" value="UTF-8"></property>
+		<!-- 设置文件上传的最大值为5MB -->
+		<property name="maxUploadSize" value="5242880"></property>
+		<!-- 设置文件上传时写入内存的最大值 如果小于这个参数不会生成临时文件 默认为10240 -->
+		<!-- <property name="maxInMemorySize" value="51200"></property> -->
+	</bean>
+
+	<!-- 配置默认servlet处理器 将springMVC不能处理的静态资源交给tomcat处理 -->
+	<mvc:default-servlet-handler />
+	<!-- 开启注解驱动 -->
+	<mvc:annotation-driven />
+	
+	<!-- 拦截器配置 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/*"/>
+			<mvc:exclude-mapping path="/generate.png"/>
+			<mvc:exclude-mapping path="/userLogin"/>
+			<bean class="com.graduationDesign.Interceptor.LoginInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+</beans>

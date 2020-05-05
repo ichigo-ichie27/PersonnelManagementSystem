@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.graduationDesign.dao.WagesManagementMapper">
+	<select id="getWagesManagementBySelectiveQuery"
+		resultType="WagesManagement">
+		select *,(select emp_name from pm_employee_information
+		where
+		pm_employee_information.id = pm_wages_management.emp_id)
+		emp_name from
+		pm_wages_management
+		<where>
+			<if test="id != null">
+				and id = #{id}
+			</if>
+			<if test="empName != null">
+				and (select emp_name from pm_employee_information where
+				pm_employee_information.id = pm_wages_management.emp_id) like
+				'${empName}%'
+			</if>
+			<if test="years != null">
+				and years = #{years}
+			</if>
+			<if test="months != null">
+				and months = #{months}
+			</if>
+		</where>
+	</select>
+
+	<delete id="moveWagesManagement">
+		delete from pm_wages_management where id = #{id}
+	</delete>
+
+	<delete id="batchDeleteWagesManagement">
+		delete from pm_wages_management where id in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<insert id="addWagesManagement">
+		insert into pm_wages_management
+		(emp_id,years,months,monthly_wages,performance_royalty,deduct,real_pay)
+		VALUES(#{empId},#{years},#{months},#{monthlyWages},#{performanceRoyalty},#{deduct},#{realPay})
+	</insert>
+
+	<update id="editWagesManagement">
+		update pm_wages_management set
+		emp_id = #{empId},
+		years = #{years},months = #{months},monthly_wages =
+		#{monthlyWages},performance_royalty = #{performanceRoyalty},deduct =
+		#{deduct},real_pay = #{realPay} where id = #{id}
+	</update>
+
+	<select id="getCountWages" resultType="java.util.Map">
+		SELECT
+		CONCAT(months,'月')date,sum(real_pay)realPay FROM
+		pm_wages_management GROUP BY date;
+	</select>
+	
+	<select id="getEmpNameAndId" resultType="Map">
+		select emp_name, id from
+		pm_employee_information
+	</select>
+</mapper>

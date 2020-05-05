@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.graduationDesign.dao.AttendanceRecordMapper">
+	<select id="getAttendanceRecordInfoBySelectQuery"
+		resultType="AttendanceRecord">
+		select id,clock_time,clock_type,same_day_time,(select emp_name from
+		pm_employee_information where pm_employee_information.id =
+		pm_attendance_record.emp_id)emp_user_name,emp_id,state from pm_attendance_record
+		<where>
+			<if test="id != null">
+				and id = #{id}
+			</if>
+			<if test="empUserName != null">
+				and (select emp_name from pm_employee_information where
+				pm_employee_information.id = pm_attendance_record.emp_id) like '${empUserName}%'
+			</if>
+			<if test="sameDayTime != null">
+				and same_day_time between DATE_FORMAT('${sameDayTime}','%Y-%m-%d') and
+				DATE_FORMAT('${sameDayTime2}','%Y-%m-%d')
+			</if>
+		</where>
+	</select>
+	
+	<update id="editStateById">
+		UPDATE pm_attendance_record set state = #{state} where id = #{id}
+	</update>
+	
+	<delete id="moveAttendanceRecord">
+		delete from pm_attendance_record where id = #{id}
+	</delete>
+	
+	<delete id="batchDeleteAttendanceRecord">
+		delete from pm_attendance_record where id in 
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+</mapper>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.graduationDesign.dao.UserMapper">
+	<resultMap type="com.graduationDesign.entity.Users"
+		id="associationUsers">
+		<id column="id" property="id" />
+		<result column="user_name" property="userName" />
+		<result column="user_pwd" property="userPwd" />
+		<result column="user_is_start" property="userIsStart" />
+		<result column="user_create_time" property="userCreateTime" />
+		<result column="user_role_id" property="userRoleId" />
+		<association property="basicInformation"
+			javaType="com.graduationDesign.entity.BasicInformation">
+			<id column="id" property="id" />
+			<result column="mark" property="mark" />
+			<result column="type_name" property="typeName" />
+		</association>
+		<association property="authorityManagement"
+			javaType="com.graduationDesign.entity.AuthorityManagement">
+			<id column="id" property="id" />
+			<result column="module_id" property="moduleId" />
+			<result column="user_role_id" property="userRoleId" />
+			<result column="is_visible" property="isVisible" />
+		</association>
+		<association property="moduleTable"
+			javaType="com.graduationDesign.entity.ModuleTable">
+			<id column="id" property="id" />
+			<result column="module_name" property="moduleName" />
+		</association>
+	</resultMap>
+
+	<select id="getUserOperationModuleName"
+		resultMap="associationUsers">
+		SELECT
+		pm_module_table.module_name FROM pm_module_table
+		LEFT
+		JOIN
+		pm_authority_management ON pm_module_table.id =
+		pm_authority_management.module_id
+		LEFT JOIN
+		pm_basic_information ON
+		pm_authority_management.user_role_id=pm_basic_information.id
+		LEFT
+		JOIN
+		pm_users ON pm_users.user_role_id = pm_basic_information.id
+		WHERE
+		pm_users.user_name=#{userName} AND pm_users.user_pwd=#{userPwd} AND
+		pm_users.user_role_id=#{userRoleId}
+	</select>
+
+	<select id="getUserByUserInformation" resultType="Users">
+		select * from
+		pm_users
+		where
+		pm_users.user_name = #{userName} and pm_users.user_pwd =
+		#{userPwd} and
+		pm_users.user_role_id = #{userRoleId}
+	</select>
+
+	<select id="getUserOperationModuleId"
+		resultMap="associationUsers">
+		select
+		pm_authority_management.module_id from
+		pm_authority_management
+		left join
+		pm_basic_information on
+		pm_authority_management.user_role_id = pm_basic_information.id
+		left
+		join
+		pm_users on pm_users.user_role_id = pm_basic_information.id
+		where
+		pm_users.user_name= #{userName} AND pm_users.user_pwd= #{userPwd} AND
+		pm_users.user_role_id= #{userRoleId}
+	</select>
+
+	<select id="getUsersBySelectiveQuery" resultType="Users">
+		select id,user_name,(select type_name from pm_basic_information where
+		id =
+		pm_users.user_role_id)user_role,user_is_start,user_create_time,user_role_id
+		from pm_users
+		<where>
+			<if test="id != null">
+				and id = #{id}
+			</if>
+			<if test="userName != null">
+				and user_name like '${userName}%'
+			</if>
+			<if test="userRole != null">
+				and (select type_name from pm_basic_information where
+				id =
+				pm_users.user_role_id) = #{userRole}
+			</if>
+		</where>
+	</select>
+
+	<delete id="moveUserById">
+		delete from pm_users where id = #{id}
+	</delete>
+
+	<delete id="batchDeleteUsers">
+		delete from pm_users where id in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<select id="getRoleNameByBasicInfo" resultType="Map">
+		select
+		type_name,id from pm_basic_information where mark = '角色类型'
+	</select>
+
+	<insert id="addUsers">
+		insert into pm_users
+		(user_name,user_pwd,user_role_id,user_is_start,user_create_time)
+		VALUES
+		(#{userName},#{userPwd},#{userRoleId},#{userIsStart},#{userCreateTime})
+	</insert>
+
+	<update id="editUsers">
+		UPDATE pm_users set user_name =
+		#{userName},user_role_id = #{userRoleId},user_is_start = #{userIsStart}
+		where id = #{id}
+	</update>
+</mapper>

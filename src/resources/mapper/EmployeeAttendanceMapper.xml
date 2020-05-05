@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.graduationDesign.dao.EmployeeAttendanceMapper">
+	<select id="getPersonnelAttendancesBySelectiveQuery"
+		resultType="AttendanceRecord">
+		select * from pm_attendance_record
+		<where>
+			<if test="empUserName != null">
+				and (select emp_user_name
+				from
+				pm_employee_information where
+				pm_employee_information.id =
+				pm_attendance_record.emp_id) =
+				#{empUserName}
+			</if>
+			<if test="id != null">
+				and id = #{id}
+			</if>
+			<if test="sameDayTime != null">
+				and same_day_time between
+				DATE_FORMAT('${sameDayTime}','%Y-%m-%d') and
+				DATE_FORMAT('${sameDayTime2}','%Y-%m-%d')
+			</if>
+		</where>
+	</select>
+
+	<delete id="movePersonnelAttendance">
+		delete from pm_attendance_record where id = #{id}
+	</delete>
+
+	<delete id="batchMovePersonnelAttendance">
+		delete from pm_attendance_record where id in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<select id="selectEmpIdByEmpName" resultType="Integer">
+		select id from
+		pm_employee_information where emp_user_name = #{empUserName}
+	</select>
+
+	<insert id="addEmpAttendance">
+		insert into pm_attendance_record
+		(clock_type,clock_time,same_day_time,emp_id) VALUES(#{clockType},#{clockTime},DATE_FORMAT('${sameDayTime}','%Y-%m-%d'),#{empId})
+	</insert>
+</mapper>

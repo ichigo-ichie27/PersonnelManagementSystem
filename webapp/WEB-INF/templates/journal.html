@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport"
+	content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta charset="utf-8" />
+<link rel="stylesheet"
+	href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css" />
+<title>系统管理-系统操作日志</title>
+</head>
+<style type="text/css">
+body, html {
+	height: 100%;
+}
+
+.container-fluid {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	background-color: #F4F6F8;
+}
+
+table th {
+	text-align: center;
+}
+
+a:hover, a:visited, a:link, a:active {
+	text-decoration: none;
+}
+
+.navigation .breadcrumb {
+	background-color: white;
+	border: 1px solid #e7e7e7;
+	border-radius: 0;
+}
+</style>
+
+<body>
+	<div class="container-fluid">
+		<!--面包屑导航-->
+		<div class="navigation">
+			<ol class="breadcrumb">
+				<li><span>系统管理</span></li>
+				<li class="active"><a href="journal.html">系统操作日志</a></li>
+			</ol>
+		</div>
+		<!--面板-->
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				操作人:<input type="text" placeholder="请输入查询的操作人" style="width: 135px;"
+					id="query_name" /> 操作时间: <input type="date" id="start_time" />至<input
+					type="date" id="end_time" />
+				<button class="btn btn-info" id="query_date">
+					<span class="glyphicon glyphicon-search"></span>查询
+				</button>
+				<button class="btn btn-danger pull-right" id="delete_all_btn">
+					<span class="glyphicon glyphicon-trash"></span>删除
+				</button>
+			</div>
+			<input type="hidden" id="start" /> <input type="hidden" id="end" /> <input
+				type="hidden" id="name" />
+			<div class="panel-body" style="height: 418px">
+				<table class="table table-hover text-center" id="operation_table">
+					<thead>
+						<tr>
+							<th><input type="checkbox" id="check_all" /></th>
+							<th>序号</th>
+							<th>操作人</th>
+							<th>操作人ip</th>
+							<th>操作内容</th>
+							<th>操作时间</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+				<!--分页信息-->
+				<div id="row">
+					<!-- 分页文字信息 -->
+					<div class="col-md-6" id="page_info_area"></div>
+					<!-- 分页条信息 -->
+					<div class="col-md-6">
+						<nav aria-label="Page navigation" id="page_nav_area"></nav>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/vue.js"></script>
+	<script type="text/javascript"
+		src="static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		//总记录数
+		let totalRecord;
+		//当前页
+		let currentPage;
+		//flag
+		let isClick = false;
+		//flag
+		let isquery = false;
+
+		$(function() {
+			to_page(1);
+		});
+
+		//分页显示
+		function to_page(pageNum) {
+			$.get("getOperationLogs", "pageNumber=" + pageNum).then(
+					function(res) {
+						//1.解析显示员工数据
+						build_informations_table(res);
+						//2.解析显示分页信息
+						build_page_info(res);
+						//3.解析显示分页条信息
+						build_page_nav(res);
+					});
+		}
+
+		//姓名查询
+		$('#query_name').bind('input propertychange', function() {
+			isquery = true;
+			let name = $("#query_name").val();
+			query_name(1, name);
+			$("#name").val(name);
+		});
+
+		//通过操作人查询日志
+		function query_name(pageNum, name) {
+			$.get("getOperationLogs",
+					"pageNumber=" + pageNum + "&" + "operator=" + name).then(
+					function(res) {
+						//1.解析显示员工数据
+						build_informations_table(res);
+						//2.解析显示分页信息
+						build_page_info(res);
+						//3.解析显示分页条信息
+						build_page_nav(res);
+					});
+		}
+
+		//通过日期查询
+		$("#query_date").click(function() {
+			isClick = true;
+			let start = $("#start_time").val();
+			let end = $("#end_time").val();
+			query_date(1, start, end);
+			$("#start").val(start);
+			$("#end").val(end);
+		});
+
+		//通过日期查询日志记录
+		function query_date(pageNum, startTime, endTime) {
+			$.get(
+					"getOperationLogs",
+					"pageNumber=" + pageNum + "&" + "startTime=" + startTime
+							+ "&" + "endTime=" + endTime).then(function(res) {
+				//1.解析显示员工数据
+				build_informations_table(res);
+				//2.解析显示分页信息
+				build_page_info(res);
+				//3.解析显示分页条信息
+				build_page_nav(res);
+
+			});
+		}
+
+		//解析显示日志记录
+		function build_informations_table(res) {
+			$("#operation_table tbody").empty();
+			let operationLogs = res.extend.pageInfo.list;
+			$.each(operationLogs, function(index, items) {
+				let checkBox = $("<td></td>").append(
+						"<input type='checkbox' class='check_item'/>");
+				let orderNum = $("<td></td>").append(index + 1);
+				let id = $("<td style='display:none'></td>").append(items.id);
+				let operator = $("<td></td>").append(items.operator);
+				let operatorIp = $("<td></td>").append(items.operatorIp);
+				let operationContent = $("<td></td>").append(
+						items.operationContent);
+				let operationTime = $("<td></td>").append(items.operationTime);
+				let delBtn = $("<button></button>").addClass(
+						"btn btn-danger btn-sm del_btn").append(
+						$("<span></span>")).addClass(
+						"glyphicon glyphicon-trash").append("删除");
+				delBtn.attr("del_id", items.id);
+				let btn = $("<td></td>").append(delBtn);
+				$("<tr></tr>").append(checkBox).append(orderNum).append(id)
+						.append(operator).append(operatorIp).append(
+								operationContent).append(operationTime).append(
+								btn).appendTo("#operation_table tbody");
+			});
+		}
+
+		//解析分页信息
+		function build_page_info(res) {
+			$("#page_info_area").empty();
+			$("#page_info_area").append(
+					"当前第" + res.extend.pageInfo.pageNum + "页,共"
+							+ res.extend.pageInfo.pages + "页,总"
+							+ res.extend.pageInfo.total + "条记录");
+			totalRecord = res.extend.pageInfo.pages;
+			currentPage = res.extend.pageInfo.pageNum;
+		}
+
+		//解析显示分页条信息
+		function build_page_nav(res) {
+			$("#page_nav_area").empty();
+			let ul = $("<ul></ul>").addClass("pagination navbar-right");
+			//上一页
+			let previous = $("<li></li>")
+					.append($("<a></a>").append("&laquo;"));
+			//判断是否还有上一页，没有就将链接禁用
+			if (res.extend.pageInfo.hasPreviousPage === false) {
+				previous.addClass("disabled");
+			} else {
+				previous.click(function() {
+					if (isClick === false && isquery === false) {
+						to_page(res.extend.pageInfo.pageNum - 1);
+					} else if (isquery === false) {
+						query_date(res.extend.pageInfo.pageNum - 1, $('#start')
+								.val(), $('#end').val());
+					} else {
+						query_name(res.extend.pageInfo.pageNum - 1, $("#name")
+								.val());
+					}
+
+				});
+			}
+			ul.append(previous);
+
+			//页码
+			let navigatepageNums = res.extend.pageInfo.navigatepageNums;
+			$.each(navigatepageNums, function(index, items) {
+				let pageNumber = $("<li></li>").append(
+						$("<a></a>").append(items));
+				//判断当前页码是否等于分页条的页码
+				if (res.extend.pageInfo.pageNum === items) {
+					//给页码添加高亮
+					pageNumber.addClass("active");
+				}
+				//给页码添加点击事件
+				pageNumber.click(function() {
+					if (isClick === false && isquery === false) {
+						to_page(items);
+					} else if (isquery === false) {
+						query_date(items, $('#start').val(), $('#end').val());
+					} else {
+						query_name(items, $("#name").val());
+					}
+
+				});
+				ul.append(pageNumber);
+			});
+
+			//下一页
+			let next = $("<li></li>").append($("<a></a>").append("&raquo;"));
+			//判断是否还有下一页，没有就将链接禁用
+			if (res.extend.pageInfo.hasNextPage === false) {
+				next.addClass("disabled");
+			} else {
+				next.click(function() {
+					if (isClick === false && isquery === false) {
+						to_page(res.extend.pageInfo.pageNum + 1);
+					} else if (isquery === false) {
+						query_date(res.extend.pageInfo.pageNum + 1, $('#start')
+								.val(), $('#end').val());
+					} else {
+						query_name(res.extend.pageInfo.pageNum + 1, $("#name")
+								.val());
+					}
+
+				});
+			}
+			ul.append(next).appendTo("#page_nav_area");
+		}
+
+		//删除日志记录
+		$(document).on(
+				"click",
+				".del_btn",
+				function() {
+					let id = $(this).parents("tr").find("td:eq(1)").text();
+					if (confirm("确认删除【" + id + "】号记录吗?")) {
+						$
+								.ajax({
+									url : "deleteOperationLog/"
+											+ $(this).attr("del_id"),
+									type : "DELETE",
+									success : function(res) {
+										if (res.code === 200) {
+											if (isClick === false
+													&& isquery === false) {
+												to_page(currentPage);
+											} else if (isquery === false) {
+												query_date(currentPage, $(
+														'#start').val(), $(
+														'#end').val());
+											} else {
+												query_name(currentPage, $(
+														"#name").val());
+											}
+
+										}
+									}
+								});
+					}
+				});
+
+		//点击单选框全选
+		$("#check_all").click(function() {
+			$(".check_item").prop("checked", $(this).prop("checked"));
+		});
+
+		//给单选框绑定事件
+		$(document)
+				.on(
+						"click",
+						".check_item",
+						function() {
+							let flag = $(".check_item:checked").length === $(".check_item").length;
+							$("#check_all").prop("checked", flag);
+						});
+
+		//批量删除日志记录
+		$("#delete_all_btn").click(
+				function() {
+					let id = "";
+					let number = "";
+					$.each($(".check_item:checked"), function() {
+						number += $(this).parents("tr").find("td:eq(1)").text()
+								+ ",";
+						id += $(this).parents("tr").find("td:eq(2)").text()
+								+ ",";
+					});
+					number = number.substring(0, id.length - 1);
+					id = id.substring(0, id.length - 1);
+					if (confirm("确认删除【" + number + "】号信息吗?")) {
+						$
+								.ajax({
+									url : "batchDeleteOperationLogs/" + id,
+									type : "DELETE",
+									success : function(res) {
+										if (res.code === 200) {
+											if (isClick === false
+													&& isquery === false) {
+												to_page(currentPage);
+											} else if (isquery === false) {
+												query_date(currentPage, $(
+														'#start').val(), $(
+														'#end').val());
+											} else {
+												query_name(currentPage, $(
+														"#name").val());
+											}
+											$("#check_all").prop("checked",
+													false);
+										}
+									}
+								});
+					}
+				});
+	</script>
+</body>
+</html>

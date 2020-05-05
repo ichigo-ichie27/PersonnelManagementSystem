@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.graduationDesign.dao.BasicInformationMapper">
+
+	<select id="getMarks" resultType="BasicInformation">
+		select DISTINCT mark from pm_basic_information
+	</select>
+	
+	<select id="getBasicInformationBySelectiveQuery" resultType="BasicInformation">
+		select * from pm_basic_information
+		<where>
+			<if test="id!=null">
+				id = #{id}
+			</if>
+			<if test="mark!=null">
+				mark = #{mark}
+			</if>
+		</where>
+	</select>
+	
+	<insert id="addBasicInformation">
+		insert into pm_basic_information (mark,type_name)
+    	values (#{mark}, #{typeName})
+	</insert>
+	
+	<update id="editBasicInformation">
+		UPDATE pm_basic_information set mark = #{mark},type_name = #{typeName} where id = #{id}
+	</update>
+	
+	<delete id="moveBasicInformation">
+		delete from pm_basic_information where id = #{id}
+	</delete>
+	
+	<delete id="batchDeleteBasicInformation">
+		delete from pm_basic_information where id in 
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+</mapper>

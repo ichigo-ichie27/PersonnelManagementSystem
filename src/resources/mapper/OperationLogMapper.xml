@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.graduationDesign.dao.OperationLogMapper">
+	<select id="getOperationLogsBySelectiveQuery"
+		resultType="OperationLog">
+		select
+		id,operator,operator_ip,operation_content,operation_time from
+		pm_operation_log
+		<where>
+			<if test="operator != null">
+				and operator like '${operator}%'
+			</if>
+			<if test="operationCurrentTime != null">
+				and operation_current_time between
+				#{operationCurrentTime} and #{operationCurrentTime}
+			</if>
+		</where>
+	</select>
+
+	<insert id="addOperationLog">
+		insert into pm_operation_log
+		(operator,operator_ip,operation_content,operation_time,operation_current_time)
+		VALUES(#{operator},#{operatorIp},#{operationContent},#{operationTime},#{operationCurrentTime})
+	</insert>
+
+	<delete id="removeOperationLogById">
+		DELETE from pm_operation_log where id = #{id}
+	</delete>
+
+	<delete id="batchRemoveOperationLog">
+		delete from pm_operation_log where id in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+</mapper>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.graduationDesign.dao.RewardsRecordsMapper">
+	<select id="getRewardsRecords" resultType="RewardsRecords">
+		select
+		rewards_type_id,rewards_time,approver from pm_rewards_records where
+		emp_id in (select id from pm_employee_information where id =
+		#{id})
+	</select>
+	
+	<insert id="addRewardsRecord">
+		insert into pm_rewards_records (rewards_time,approver,emp_id,rewards_type_id) VALUES(#{rewardsTime},#{approver},#{empId},#{rewardsTypeId});
+	</insert>
+</mapper>

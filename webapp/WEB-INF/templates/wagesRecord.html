@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport"
+	content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta charset="utf-8" />
+<link rel="stylesheet"
+	href="static/bootstrap-3.3.7-dist/css/bootstrap.min.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1677765_nua0897k4e.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1648998_zqaf20d4ezr.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1648999_174564zlj3h.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1679837_wtp5a8kzeh.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1649000_v7egkzifdjn.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1649008_bc85s1qq2yf.css" />
+<link rel="stylesheet"
+	href="//at.alicdn.com/t/font_1683235_rxwe6zyfpmr.css" />
+<title>工资管理-工资记录</title>
+</head>
+<style type="text/css">
+body, html {
+	height: 100%;
+}
+
+.container-fluid {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	background-color: #F4F6F8;
+}
+
+.navigation .breadcrumb {
+	background-color: white;
+	border: 1px solid #e7e7e7;
+	border-radius: 0;
+}
+
+table th {
+	text-align: center;
+}
+
+a:hover, a:visited, a:link, a:active {
+	text-decoration: none;
+}
+</style>
+
+<body>
+	<!-- 新增工资记录模态框 -->
+	<div class="modal fade" tabindex="-1" role="dialog" id="addWagesModal">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">
+						<span class="iconfont icon-xinzeng"></span>新增工资记录
+					</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal" id="form_add_modal">
+						<div class="form-group">
+							<label class="col-sm-2 control-label">姓名</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="empId"
+									id="empName_add_select"></select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">年份</label>
+							<div class="col-sm-4">
+								<select class="form-control" name="years">
+									<option>请选择</option>
+									<option>2016</option>
+									<option>2017</option>
+									<option>2018</option>
+									<option>2019</option>
+									<option>2020</option>
+									<option>2021</option>
+									<option>2022</option>
+									<option>2023</option>
+									<option>2024</option>
+								</select>
+							</div>
+							<label class="col-sm-2 control-label">月份</label>
+							<div class="col-sm-4">
+								<select class="form-control" name="months">
+									<option>请选择</option>
+									<option>1</option>
+									<option>2</option>
+									<option>3</option>
+									<option>4</option>
+									<option>5</option>
+									<option>6</option>
+									<option>7</option>
+									<option>8</option>
+									<option>9</option>
+									<option>10</option>
+									<option>11</option>
+									<option>12</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">月工资</label>
+							<div class="col-sm-10">
+								<input class="form-control" type="number" name="monthlyWages" placeholder="月工资" required/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">绩效提成</label>
+							<div class="col-sm-10">
+								<input class="form-control" type="number" name="performanceRoyalty" placeholder="绩效提成" required/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">扣除</label>
+							<div class="col-sm-10">
+								<input class="form-control" type="number" name="deduct" placeholder="扣除"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">实发工资</label>
+							<div class="col-sm-10">
+								<input class="form-control" type="number" name="realPay" placeholder="实发工资" required/>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+						<i class="iconfont icon-guanbi"></i>关闭
+					</button>
+					<button type="submit" class="btn btn-primary" form="form_add_modal">
+						<i class="iconfont icon-baocun"></i>保存
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 修改工资记录模态框 -->
+	<div class="modal fade" tabindex="-1" role="dialog" id="editWagesModal">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">
+						<span class="iconfont icon-xiugai"></span>修改工资记录
+					</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal" id="form">
+						<div class="form-group">
+							<label class="col-sm-2 control-label">姓名</label>
+							<div class="col-sm-10">
+								<select class="form-control" name="empId"
+									id="empName_edit_select"></select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">年份</label>
+							<div class="col-sm-4">
+								<select class="form-control" name="years" id="years_edit_select">
+									<option>请选择</option>
+									<option>2016</option>
+									<option>2017</option>
+									<option>2018</option>
+									<option>2019</option>
+									<option>2020</option>
+									<option>2021</option>
+									<option>2022</option>
+									<option>2023</option>
+									<option>2024</option>
+								</select>
+							</div>
+							<label class="col-sm-2 control-label">月份</label>
+							<div class="col-sm-4">
+								<select class="form-control" name="months"
+									id="months_edit_select">
+									<option>请选择</option>
+									<option>1</option>
+									<option>2</option>
+									<option>3</option>
+									<option>4</option>
+									<option>5</option>
+									<option>6</option>
+									<option>7</option>
+									<option>8</option>
+									<option>9</option>
+									<option>10</option>
+									<option>11</option>
+									<option>12</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">月工资</label>
+							<div class="col-sm-10">
+								<input class="form-control" type="number" name="monthlyWages" id="monthlyWages_edit"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">绩效提成</label>
+							<div class="col-sm-10">
+								<input class="form-control" type="number" name="performanceRoyalty"
+									id="performanceRoyalty_edit"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">扣除</label>
+							<div class="col-sm-10">
+								<input class="form-control" type="number" name="deduct" id="deduct_edit"/>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">实发工资</label>
+							<div class="col-sm-10">
+								<input class="form-control" type="number" name="realPay" id="realPay_edit"/>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+						<i class="iconfont icon-guanbi"></i>关闭
+					</button>
+					<button type="button" class="btn btn-primary" id="wages_edit_btn">
+						<i class="iconfont icon-bianji"></i>编辑
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 工资统计模态框 -->
+	<div class="modal fade" tabindex="-1" role="dialog"
+		id="count_wages_modal">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">
+						<span class="iconfont icon-tongji"></span>工资统计
+					</h4>
+				</div>
+				<div class="modal-body">
+					<div id="count_wages_chart"
+					style="height: 400px;"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container-fluid">
+		<!--面包屑导航-->
+		<div class="navigation">
+			<ol class="breadcrumb">
+				<li><span>工资管理</span></li>
+				<li class="active"><a href="wagesRecord.html">工资记录</a></li>
+			</ol>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				姓名:<input type="text" placeholder="请输入查询的姓名" style="width: 135px;"
+					id="serchName" /> 年份: <select style="height: 28px;"
+					id="years_select">
+					<option>请选择</option>
+					<option>2016</option>
+					<option>2017</option>
+					<option>2018</option>
+					<option>2019</option>
+					<option>2020</option>
+					<option>2021</option>
+					<option>2022</option>
+					<option>2023</option>
+					<option>2024</option>
+				</select> 月份: <select style="height: 28px;" id="months_select">
+					<option>请选择</option>
+					<option>1</option>
+					<option>2</option>
+					<option>3</option>
+					<option>4</option>
+					<option>5</option>
+					<option>6</option>
+					<option>7</option>
+					<option>8</option>
+					<option>9</option>
+					<option>10</option>
+					<option>11</option>
+					<option>12</option>
+				</select>
+				<button class="btn btn-info" id="query_date">
+					<span class="glyphicon glyphicon-search"></span>查询
+				</button>
+				<button class="btn btn-info" id="count_wages">
+					<span class="iconfont icon-gongzijisuan"></span>工资统计
+				</button>
+				<button class="btn btn-danger pull-right" id="del_all_btn">
+					<span class="glyphicon glyphicon-trash"></span>删除
+				</button>
+				<button class="btn btn-primary pull-right"
+					style="margin-right: 5px;" id="wages_add_modal_btn">
+					<span class="glyphicon glyphicon-plus-sign"></span>新增
+				</button>
+			</div>
+			<input type="hidden" id="name" /> <input type="hidden" id="years" />
+			<input type="hidden" id="months" />
+			<div class="panel-body" style="height: 417px">
+				<table class="table table-hover text-center" id="wagesRecord_table">
+					<thead>
+						<tr>
+							<th><input type="checkbox" id="check_all" /></th>
+							<th>序号</th>
+							<th>员工姓名</th>
+							<th>时间</th>
+							<th>月工资</th>
+							<th>绩效提成</th>
+							<th>扣除</th>
+							<th>实发工资</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+				<!--分页信息-->
+				<div id="row">
+					<!-- 分页文字信息 -->
+					<div class="col-md-6" id="page_info_area"></div>
+					<!-- 分页条信息 -->
+					<div class="col-md-6">
+						<nav aria-label="Page navigation" id="page_nav_area"></nav>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/vue.js"></script>
+	<script type="text/javascript"
+		src="static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="js/echarts.min.js"></script>
+	<script>
+		//总记录数
+		let totalRecord;
+		//当前页
+		let currentPage;
+		
+		let isClick = false;
+		
+		let isQueryName = false;
+
+		$(function() {
+			to_page(1);
+		});
+
+		function to_page(pageNum) {
+			$.get("wagesManagement", "pageNumber=" + pageNum).then(
+					function(res) {
+						//1.解析显示员工数据
+						build_informations_table(res);
+						//2.解析显示分页信息
+						build_page_info(res);
+						//3.解析显示分页条信息
+						build_page_nav(res);
+					});
+		}
+		
+		//姓名查询
+		$('#serchName').bind('input propertychange', function(){
+			isQueryName = true;
+			let name = $("#serchName").val();
+			query_name(1,name);
+			$("#name").val(name);
+		});
+		
+		function query_name(pageNum,name){
+			$.get("wagesManagement","pageNumber="+pageNum+"&"+"empName=" +name).then(
+					function(res) {
+						//1.解析显示员工数据
+						build_informations_table(res);
+						//2.解析显示分页信息
+						build_page_info(res);
+						//3.解析显示分页条信息
+						build_page_nav(res);
+					});
+		}
+		
+		//通过日期查询
+		$("#query_date").click(function(){
+			isClick = true;
+			let years = $("#years_select").val();
+			let months = $("#months_select").val();
+			query_date(1,years,months);
+			$("#years").val(years);
+			$("#months").val(months);
+		});
+		
+		function query_date(pageNum,years,months){
+			$.get("wagesManagement","pageNumber="+pageNum+"&"+"years=" +years+"&"+"months="+months).then(
+					function(res) {
+						//1.解析显示员工数据
+						build_informations_table(res);
+						//2.解析显示分页信息
+						build_page_info(res);
+						//3.解析显示分页条信息
+						build_page_nav(res);
+					});
+		}
+		
+		//解析员工数据
+		function build_informations_table(res) {
+			$("#wagesRecord_table tbody").empty();
+			let wages = res.extend.pageInfo.list;
+			$.each(wages, function(index, items) {
+				let checkBox = $("<td></td>").append(
+						"<input type='checkbox' class='check_item'/>");
+				let id = $("<td></td>").append(items.id);
+				let empName = $("<td></td>").append(items.empName);
+				let time = $("<td></td>").append(
+						items.years + "年" + items.months + "月");
+				let monthlyWages = $("<td></td>").append(
+						items.monthlyWages + ".00");
+				let performanceRoyalty = $("<td></td>").append(
+						items.performanceRoyalty + ".00");
+				let deduct = $("<td></td>").append(items.deduct);
+				if (deduct.text() != "") {
+					deduct = $("<td></td>").append(items.deduct + ".00");
+				}
+				let realPay = $("<td></td>").append(items.realPay + ".00");
+				let editBtn = $("<button></button>").addClass(
+						"btn btn-primary btn-sm edit_btn").append(
+						$("<span></span>")).addClass(
+						"glyphicon glyphicon-pencil").append("编辑");
+				//为编辑按钮添加一个自定义的属性，来表示当前员工id
+				editBtn.attr("edit_id", items.id);
+				let delBtn = $("<button></button>").addClass(
+						"btn btn-danger btn-sm del_btn").append(
+						$("<span></span>")).addClass(
+						"glyphicon glyphicon-trash").append("删除");
+				//为删除按钮添加一个自定义属性，表示当前员工id
+				delBtn.attr("del_id", items.id);
+				let btnTd = $("<td></td>").append(editBtn).append(" ").append(
+						delBtn);
+				$("<tr></tr>").append(checkBox).append(id).append(empName)
+						.append(time).append(monthlyWages).append(
+								performanceRoyalty).append(deduct).append(
+								realPay).append(btnTd).appendTo(
+								"#wagesRecord_table tbody");
+			});
+		}
+
+		//解析分页条信息
+		function build_page_info(res) {
+			$("#page_info_area").empty();
+			$("#page_info_area").append(
+					"当前第" + res.extend.pageInfo.pageNum + "页,共"
+							+ res.extend.pageInfo.pages + "页,总"
+							+ res.extend.pageInfo.total + "条记录");
+			totalRecord = res.extend.pageInfo.pages;
+			currentPage = res.extend.pageInfo.pageNum;
+		}
+
+		//3.解析分页条信息
+		function build_page_nav(res) {
+			$("#page_nav_area").empty();
+			let ul = $("<ul></ul>").addClass("pagination navbar-right");
+			//上一页
+			let previous = $("<li></li>")
+					.append($("<a></a>").append("&laquo;"));
+			//判断是否还有上一页，没有就将链接禁用
+			if (res.extend.pageInfo.hasPreviousPage === false) {
+				previous.addClass("disabled");
+			} else {
+				previous.click(function() {
+					if(isClick === false&&isQueryName === false){
+						to_page(res.extend.pageInfo.pageNum - 1);
+					}else if(isClick === false){
+						query_name(res.extend.pageInfo.pageNum - 1,$("#name").val());
+					}else{
+						query_date(res.extend.pageInfo.pageNum - 1,$("#years").val(),$("#months").val());
+					}
+					
+				});
+			}
+			ul.append(previous);
+
+			//页码
+			let navigatepageNums = res.extend.pageInfo.navigatepageNums;
+			$.each(navigatepageNums, function(index, items) {
+				let pageNumber = $("<li></li>").append(
+						$("<a></a>").append(items));
+				//判断当前页码是否等于分页条的页码
+				if (res.extend.pageInfo.pageNum === items) {
+					//给页码添加高亮
+					pageNumber.addClass("active");
+				}
+				//给页码添加点击事件
+				pageNumber.click(function() {
+					if(isClick === false&&isQueryName === false){
+						to_page(items);
+					}else if(isClick === false){
+						query_name(items,$("#name").val());
+					}else{
+						query_date(items,$("#years").val(),$("#months").val());
+					}
+					
+				});
+				ul.append(pageNumber);
+			});
+
+			//下一页
+			let next = $("<li></li>").append($("<a></a>").append("&raquo;"));
+			//判断是否还有下一页，没有就将链接禁用
+			if (res.extend.pageInfo.hasNextPage === false) {
+				next.addClass("disabled");
+			} else {
+				next.click(function() {
+					if(isClick === false&&isQueryName === false){
+						to_page(res.extend.pageInfo.pageNum + 1);
+					}else if(isClick === false){
+						query_name(res.extend.pageInfo.pageNum + 1,$("#name").val());
+					}else{
+						query_date(res.extend.pageInfo.pageNum + 1,$("#years").val(),$("#months").val());
+					}
+					
+				});
+			}
+			ul.append(next).appendTo("#page_nav_area");
+		}
+
+		//删除工资记录
+		$(document).on("click", ".del_btn", function() {
+			let name = $(this).parents("tr").find("td:eq(2)").text();
+			if (confirm("确认删除【" + name + "】的信息吗?")) {
+				$.ajax({
+					url : "deleteWages/" + $(this).attr("del_id"),
+					type : "DELETE",
+					success : function(res) {
+						if (res.code === 200) {
+							if(isClick === false&&isQueryName === false){
+								to_page(currentPage);
+							}else if(isClick === false){
+								query_name(currentPage,$("#name").val());
+							}else{
+								query_date(currentPage,$("#years").val(),$("#months").val());
+							}
+						}
+					}
+				});
+			}
+		});
+
+		//点击单选框全选
+		$("#check_all").click(function() {
+			$(".check_item").prop("checked", $(this).prop("checked"));
+		});
+
+		//给单选框绑定事件
+		$(document)
+				.on(
+						"click",
+						".check_item",
+						function() {
+							let flag = $(".check_item:checked").length === $(".check_item").length;
+							$("#check_all").prop("checked", flag);
+						});
+
+		//批量删除工资记录
+		$("#del_all_btn").click(function() {
+			let id = "";
+			$.each($(".check_item:checked"), function() {
+				id += $(this).parents("tr").find("td:eq(1)").text() + ",";
+			});
+			id = id.substring(0, id.length - 1);
+			if (confirm("确认删除【" + id + "】号信息吗?")) {
+				$.ajax({
+					url : "batchDeleteWages/" + id,
+					type : "DELETE",
+					success : function(res) {
+						if (res.code === 200) {
+							if(isClick === false&&isQueryName === false){
+								to_page(currentPage);
+							}else if(isClick === false){
+								query_name(currentPage,$("#name").val());
+							}else{
+								query_date(currentPage,$("#years").val(),$("#months").val());
+							}
+							$("#check_all").prop("checked", false);
+						}
+					}
+				});
+			}
+		});
+
+		//查询员工姓名和id
+		function getEmpInfo(ele) {
+			$(ele).empty();
+			$.get("getEmpInfo").then(
+					function(res) {
+						$("#empName_add_select").empty();
+						$.each(res.extend.empInfo, function() {
+							let optionEle = $("<option></option>").append(
+									this.emp_name).attr("value", this.id);
+							optionEle.appendTo(ele);
+						});
+					});
+		}
+
+		//打开新增工资记录模态框
+		$("#wages_add_modal_btn").click(function() {
+			//清空表单数据
+			$("#addWagesModal form")[0].reset();
+			getEmpInfo("#empName_add_select");
+			$("#addWagesModal").modal({
+				backdrop : "static"
+			});
+		});
+		
+		//点击保存
+		$("#form_add_modal").submit(
+				function() {
+					$.post("insertWages", $("#addWagesModal form").serialize())
+					.then(function(res) {
+						if(res.code === 200){
+							$("#addWagesModal").modal("hide");
+							if(isClick === false&&isQueryName === false){
+								to_page(totalRecord);
+							}else if(isClick === false){
+								query_name(totalRecord,$("#name").val());
+							}else{
+								query_date(totalRecord,$("#years").val(),$("#months").val());
+							}
+						}			
+					});
+					return false;
+				});
+		
+		//通过id查询数据
+		function getWagesById(id){
+			$.get("selectWagesById","id="+id).then(function(res){
+				let wagesData = res.extend.getWagesById;
+				$("#empName_edit_select").val([wagesData[0].empId]);
+				$("#years_edit_select").val([wagesData[0].years]);
+				$("#months_edit_select").val([wagesData[0].months]);
+				$("#monthlyWages_edit").val(wagesData[0].monthlyWages);
+				$("#performanceRoyalty_edit").val(wagesData[0].performanceRoyalty);
+				$("#deduct_edit").val(wagesData[0].deduct);
+				$("#realPay_edit").val(wagesData[0].realPay);
+			});
+		}
+
+		//打开修改工资记录模态框
+		$(document).on("click", ".edit_btn", function() {
+			//清空表单数据
+			$("#editWagesModal form")[0].reset();
+			getEmpInfo("#empName_edit_select");
+			//回显数据
+			getWagesById($(this).attr("edit_id"));
+			$("#wages_edit_btn").attr("edit_btn_id",$(this).attr("edit_id"));
+			$("#editWagesModal").modal({
+				backdrop : "static"
+			});
+		});
+		
+		//点击修改
+		$("#wages_edit_btn").click(function(){
+			$.ajax({
+				url:"updateWages/"+$(this).attr("edit_btn_id"),
+				type:"PUT",
+				data:$("#editWagesModal form").serialize(),
+				success:function(res){
+					if(res.code === 200){
+						$("#editWagesModal").modal("hide");
+						if(isClick === false&&isQueryName === false){
+							to_page(currentPage);
+						}else if(isClick === false){
+							query_name(currentPage,$("#name").val());
+						}else{
+							query_date(currentPage,$("#years").val(),$("#months").val());
+						}
+					}
+				}
+			});
+		});
+		
+		
+	</script>
+	<!-- <script type="text/javascript">
+		let addForm = new Vue({
+			el:'#form_add_modal',
+			data:{
+				monthlyWages:'',
+				performanceRoyalty:'',
+				deduct:'',
+				realPay:''
+			},
+			methods:{
+				getRealPay(){
+					this.realPay = Number(this.monthlyWages)+Number(this.performanceRoyalty)-Number(this.deduct); 
+				}
+			}
+		});
+	</script> -->
+	<script>
+		$("#count_wages").click(function(){
+			$("#count_wages_modal").modal({
+				backdrop : "static"
+			});
+		});
+		
+		let wagesChart = echarts.init(document.getElementById('count_wages_chart'));
+		wagesChart.setOption({
+			title:{
+				text:'2020年各月工资总支出',
+				x:'center'
+			},
+			legend:{
+				type:'plain',
+				top:'3%',
+				right:'right',
+				orient:'vertical',
+				data:['总支出']
+			},
+			//提示框设置
+			tooltip:{
+				trigger:'item',
+				formatter:'{b} <br/>{a} : {c}元'
+			},
+			 xAxis: [{
+				 name:'月份',     
+                 data: [],
+                 nameGap:15,//坐标轴名称与轴线之间的距离
+                 axisLine:{
+                	 show:true,
+                	 symbol:['none','arrow'],//是否显示轴线箭头
+                	 symbolSize:[8, 8],//箭头大小
+                	 symbolOffset:[0,7]//箭头位置	
+                 },
+                 axisTick:{                  //坐标轴 刻度
+                     show:true,                  //是否显示
+                     inside:true,                //是否朝内
+                     length:4                    //长度
+                 }
+             }],
+             yAxis: [{
+            	 name:'总支出',
+            	 nameGap:15,     //坐标轴名称与轴线之间的距离
+            	 axisLine:{                  //坐标轴 轴线
+                     show:true,                  //是否显示
+                     symbol:['none', 'arrow'],   //是否显示轴线箭头
+                     symbolSize:[8, 8] ,         //箭头大小
+                     symbolOffset:[0,7]         //箭头位置
+                 },
+                 axisTick:{                  //坐标轴 刻度
+                     show:true,                  //是否显示
+                     inside:true,                //是否朝内
+                     length:4                    //长度
+                 },
+                 splitLine:{                 //grid 区域中的分隔线
+                     show:true,                  //是否显示，'category'类目轴不显示，此时我的y轴为类目轴，splitLine属性是有意义的
+                     lineStyle:{
+                         color:'#666',
+                         width:1,
+                         type:'dashed'          //类型
+                     }
+                 }
+             }],
+             series: [{
+                 name: '总支出',
+                 type: 'bar',
+                 data: [],
+                 itemStyle:{                 //图形形状
+                     //barBorderRadius:[18,18,0,0]
+                 },
+                 barWidth:'50',              //柱形宽度
+                 //barCategoryGap:'100%'      //柱形间距
+             }]
+		});
+		wagesChart.showLoading();
+		let xAxisData = [];
+		let seriesData = [];
+		$.get("sumWages").then(function(res){
+			if(res.code === 200){
+				let sumWages = res.extend.countWages;
+				$.each(sumWages,function(index,res){
+					xAxisData.push(res.date);
+					let obj = new Object();
+					obj.name = res.date;
+					obj.value = res.realPay;
+					seriesData.push(obj);
+				});
+				wagesChart.hideLoading();
+				wagesChart.setOption({
+					xAxis:{
+						data:xAxisData
+					},
+					series:{
+						data:seriesData
+					}
+				});
+			}
+		});
+		
+		$('#count_wages_modal').on('shown.bs.modal',function(){
+			wagesChart.resize();
+		});
+	</script>
+</body>
+</html>

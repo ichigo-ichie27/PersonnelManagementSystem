@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+  <configuration>
+  <!-- 开启驼峰命名规则 -->
+  	<settings>
+  		<setting name="mapUnderscoreToCamelCase" value="true"/>
+  		<setting name="logImpl" value="STDOUT_LOGGING"/>  
+  	</settings>
+  	<!-- 类型别名 -->
+  	<typeAliases>
+  		<package name="com.graduationDesign.entity"/>
+  	</typeAliases>
+  	<!-- 配置分页查询插件pagehelper -->
+  	<plugins>
+  		<plugin interceptor="com.github.pagehelper.PageInterceptor">
+  			<!-- 调整分页参数合理化 -->
+  			<property name="reasonable" value="true"/>
+  		</plugin>
+  	</plugins>
+  </configuration>
