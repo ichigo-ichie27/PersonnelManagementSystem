@@ -10,9 +10,15 @@
 ![image](https://github.com/ichigo-ichie27/PersonnelManagementSystem/blob/master/images/QQ截图20200422122002.png)
 ## 系统实物图
 ![image](https://github.com/ichigo-ichie27/PersonnelManagementSystem/blob/master/images/QQ%E6%88%AA%E5%9B%BE20200423110606.png)
+
 ![image](https://github.com/ichigo-ichie27/PersonnelManagementSystem/blob/master/images/QQ%E6%88%AA%E5%9B%BE20200423130854.png)
+
 ![image](https://github.com/ichigo-ichie27/PersonnelManagementSystem/blob/master/images/QQ%E6%88%AA%E5%9B%BE20200423231146.png)
+
 ![image](https://github.com/ichigo-ichie27/PersonnelManagementSystem/blob/master/images/QQ%E6%88%AA%E5%9B%BE20200424103244.png)
+
 ![image](https://github.com/ichigo-ichie27/PersonnelManagementSystem/blob/master/images/QQ%E6%88%AA%E5%9B%BE20200424124344.png)
+
 ![image](https://github.com/ichigo-ichie27/PersonnelManagementSystem/blob/master/images/QQ%E6%88%AA%E5%9B%BE20200424134158.png)
+
 ![image](https://github.com/ichigo-ichie27/PersonnelManagementSystem/blob/master/images/QQ%E6%88%AA%E5%9B%BE20200424160219.png)
