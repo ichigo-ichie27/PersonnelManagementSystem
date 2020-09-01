@@ -81,39 +81,18 @@ a:hover, a:visited, a:link, a:active {
 		});
 
 		function build_authority_table() {
-			$
-					.get("getModules")
-					.then(
-							function(res) {
-								if (res.code === 200) {
-									$("#authority_table tbody").empty();
-									let authority = res.extend.modules;
-									$
-											.each(
-													authority,
-													function(index, items) {
-														let checkBoxTd = $(
-																"<td></td>")
-																.append(
-																		"<input type='checkbox' class='check_item'/>");
-														let id = $("<td></td>")
-																.append(
-																		items.id);
-														let moduleName = $(
-																"<td></td>")
-																.append(
-																		items.module_name);
-														$("<tr></tr>")
-																.append(
-																		checkBoxTd)
-																.append(id)
-																.append(
-																		moduleName)
-																.appendTo(
-																		"#authority_table tbody");
-													});
-								}
-							});
+			$.get("getModules").then(function(res) {
+				if (res.code === 200) {
+					$("#authority_table tbody").empty();
+					let authority = res.extend.modules;
+					$.each(authority,function(index, items) {
+						let checkBoxTd = $("<td></td>").append("<input type='checkbox' class='check_item'/>");
+						let id = $("<td></td>").append(items.id);
+						let moduleName = $("<td></td>").append(items.module_name);
+						$("<tr></tr>").append(checkBoxTd).append(id).append(moduleName).appendTo("#authority_table tbody");
+					});
+				}
+			});
 		}
 
 		//给全选单选框添加点击事件
